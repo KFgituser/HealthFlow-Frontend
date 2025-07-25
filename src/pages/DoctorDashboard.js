@@ -4,6 +4,7 @@ import api from '../services/api';
 import { useNavigate, Link } from "react-router-dom";
 import styles from '../styles/HomePage.module.css';
 import '../styles/DoctorDashboard.css'
+import AddAvailabilityForm from '../components/AddAvailabilityForm';
 
 export default function DoctorDashboard(){
     const navigate = useNavigate();
@@ -11,7 +12,8 @@ export default function DoctorDashboard(){
     const [view, setView] = useState('dashboard'); // or 'viewSchedule', 'editSlot'
 
     // State for form
-    const [selectedDay, setSelectedDay] = useState('');
+    const [selectedDays, setSelectedDays] = useState([]);
+    const [selectedDay, setSelectedDay] = useState([]);
     const [repeat, setRepeat] = useState('none');
     const [startTime, setStartTime] = useState('');
     const [endTime, setEndTime] = useState('');
@@ -105,7 +107,7 @@ export default function DoctorDashboard(){
           <button onClick={() => setView('dashboard')}>Back</button>
         </div>
       );
-
+      //availability form
       const AvailabilityForm = () => (
       <div className="availability-form section">
         <h2>Doctor Dashboard</h2>
@@ -115,8 +117,14 @@ export default function DoctorDashboard(){
           {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(day => (
             <button
               key={day}
-              className={`day-button ${selectedDay === day ? 'selected' : ''}`}
-              onClick={() => setSelectedDay(day)}
+              className={`day-button ${selectedDays.includes(day) ? 'selected' : ''}`}
+             onClick={() => {
+                setSelectedDays(prev =>
+                  prev.includes(day)
+                    ? prev.filter(d => d !== day)  // remove if already selected
+                    : [...prev, day]               // add if not selected
+                );
+              }}
             >
               {day}
             </button>
@@ -141,13 +149,13 @@ export default function DoctorDashboard(){
 
           <div className="time-options">
             <label>Start Time:</label>
-            <input type="time" onChange={e => setStartTime(e.target.value)} />
+            <input type="time" value={startTime} onChange={e => setStartTime(e.target.value)} />
             <label>End Time:</label>
-            <input type="time" onChange={e => setEndTime(e.target.value)} />
+            <input type="time" value={endTime} onChange={e => setEndTime(e.target.value)} />
           </div>
 
           <label>Or Select a Date:</label>
-          <input type="date" onChange={e => setSpecificDate(e.target.value)} />
+          <input type="date" value={specificDate} onChange={e => setSpecificDate(e.target.value)} />
 
           <div className="form-buttons">
             <button onClick={handleSave}>Save</button>
@@ -180,7 +188,9 @@ export default function DoctorDashboard(){
                   {view === 'dashboard' && <DashboardOverview />}
                   {view === 'editSlot' && <AvailabilityForm />}
                 </div>
-
+                {view === 'addAvailability' && (
+                  <AvailabilityForm /> //
+                )}  
                 {/*  schedule-view */}
          {view === 'viewSchedule' && (
           <div className="schedule-view-wrapper">
@@ -202,7 +212,8 @@ export default function DoctorDashboard(){
               )}
             </div>
 
-            <button onClick={handleAddSlotClick} className="your-button-class">+ Add Availability Slot</button>
+           <button onClick={() => setView('addAvailability')}>+ Add Availability Slot</button>
+            
 
             <div className="form-buttons">
               <button onClick={() => setView('dashboard')}>Okay</button>

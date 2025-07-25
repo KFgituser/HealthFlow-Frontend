@@ -19,19 +19,22 @@ export default function HomePage() {
                   />
                   <h4 className="mb-0 text-dark">HealthFlow</h4>
                 </Link>
-                <div>
-                    <Link to="/help" className="btn btn-outline-secondary me-2">Help</Link>
-                    {user ? (
-                        <>
-                        <span className="me-2">Hi, {user.firstName}!</span>
-                        <a href="#" onClick={logout} className="btn btn-outline-danger">Log Out</a>
-                        </>
-                    ) : (
-                        <>
-                        <Link to="/login" className="btn btn-outline-primary me-2">Log in</Link>
-                        <Link to="/register" className="btn btn-outline-success">Sign Up</Link>
-                        </>
-                    )}
+               <div>
+                {user && (
+                    <Link to="/appointments" className="btn btn-outline-primary me-2">My Apts</Link>
+                )}
+                <Link to="/help" className="btn btn-outline-secondary me-2">Help</Link>
+                {user ? (
+                    <>
+                    <span className="me-2">Hi, {user.firstName}!</span>
+                    <a href="#" onClick={logout} className="btn btn-outline-danger">Log Out</a>
+                    </>
+                ) : (
+                    <>
+                    <Link to="/login" className="btn btn-outline-primary me-2">Log in</Link>
+                    <Link to="/register" className="btn btn-outline-success">Sign Up</Link>
+                    </>
+                )}
                 </div>
             </nav>
 

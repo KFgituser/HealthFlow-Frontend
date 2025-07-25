@@ -14,6 +14,7 @@ import { AuthProvider } from './contexts/AuthContext'
 import logo from './logo.svg';
 import './App.css';
 
+import Appointment from './pages/Appointment';
 function App() {
   // keep logged in
   
@@ -28,6 +29,7 @@ function App() {
         <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
         <Route path="/doctor/:id" element={<DoctorCard />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/appointments" element={<Appointment />} />
         
         {/* add more routes here */}
       </Routes>

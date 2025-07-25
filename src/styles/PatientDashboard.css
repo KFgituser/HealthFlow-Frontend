@@ -1,0 +1,148 @@
+
+
+.result-summary {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+}
+
+.summary-count {
+  font-weight: 700;
+  font-size: 28px;
+  color: #222;
+}
+
+.summary-label {
+  font-size: 18px;
+  color: #222;
+}
+
+.summary-dates {
+  font-size: 17px;
+  font-weight: 700;
+  color: #222;
+}
+
+
+.expanded-map {
+  position: fixed;
+  top: 60px; /* adjust if needed */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: white;
+  z-index: 9999;
+  padding: 20px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.expanded-map .expand-map-btn {
+  align-self: flex-start;
+  margin-bottom: 10px;
+  z-index: 10000;
+}
+
+.expanded-map .gm-style {
+  border-radius: 0 !important;
+}
+.arrow {
+  font-size: 36px;
+  line-height: 1;
+}
+
+/* filters */
+.filter-bar {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  margin-bottom: 20px;
+}
+
+.filter-bar .form-label {
+  font-weight: 500;
+  color: #222;
+}
+
+.filter-bar .form-select {
+  width: 160px;
+}
+
+
+.page-container, .main-dashboard {
+  display: flex;
+  align-items: flex-start;
+}
+
+
+.availability-button {
+  font-size: 14px;
+  padding: 12px 10px;
+  border-radius: 8px;
+  width: 90px;
+  height: 80px;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.availability-button.has-slots {
+  background: linear-gradient(to right, #00bcd4, #8bc34a) !important;
+  color: black !important;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.availability-button.no-slots {
+  background-color: #e0e0e0;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.next-available-button {
+  background:  linear-gradient(to right, #00bcd4, #8bc34a);
+  color: black;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.availability-spacing {
+  margin-top: 20px;
+  margin-left: 70px;
+}
+
+.doctor-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100px;   /* same as image height */
+}
+
+
+
+
+
+/* Right panel containing map */
+.right-panel {
+  width: 920px;
+  margin-left: 5px;
+}
+
+/* Sticky map box */
+.sticky-map-container {
+  position: sticky;
+  top: 40px; /* Distance from top of screen */
+  max-height: calc(100vh - 100px);
+}
+
+/*  Prevent map overflow */
+.map-section {
+  overflow: hidden;
+}
+
