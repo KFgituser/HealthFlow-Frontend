@@ -105,9 +105,13 @@ export default function HomePage() {
                 {/* App Section */}
                 <div className="col-md-3">
                     <h5 className="text-white mb-3">Get the HealthFlow App</h5>
-                    <img src="/images/appstore.png" alt="App Store" className="mb-2" width="120" />
+                    <a href="https://www.apple.com/app-store/" target="_blank" rel="noopener noreferrer">
+                        <img src="/images/appstore.png" alt="App Store" className="mb-2" width="120" />
+                    </a>
                     <br />
-                    <img src="/images/googleplay.png" alt="Google Play" width="120" />
+                    <a href="https://play.google.com/store" target="_blank" rel="noopener noreferrer">
+                        <img src="/images/googleplay.png" alt="Google Play" width="120" />
+                    </a>
                 </div>
 
                 </div>

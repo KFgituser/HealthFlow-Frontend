@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from "react-router-dom";
 import styles from '../styles/HomePage.module.css';
-
+import '../styles/Appointments.css';
+import axios from 'axios';
 
     const Appointment = () => {
         const navigate = useNavigate();
@@ -11,16 +12,75 @@ import styles from '../styles/HomePage.module.css';
             try {
             await fetch("http://localhost:8080/logout", {
                 method: "POST",
-                credentials: "include", // Important for session cookies
+                credentials: "include", // for session cookies
             });
-            // Optionally clear any local state or context
             navigate("/login");
             } catch (error) {
             console.error("Logout failed:", error);
             }
         };
-    
-    
+        
+        //Appointments
+        useEffect(() => {
+            const user = JSON.parse(localStorage.getItem("user"));
+            if (!user) return;
+
+            console.log("User:", user);
+            axios.get(`/api/appointments/user/${user.id}`, {
+                withCredentials: true
+            })
+                .then(response => {
+            console.log("Fetched appointments:", response.data);
+                setAppointments(response.data);
+                })
+            .catch(error => console.error(error));
+            }, []);
+        //define handleReschedule and handleCancel
+        //Reschedule
+        const handleReschedule = async (id) => {
+            const confirmed = window.confirm("This will delete your current appointment. Continue?");
+            if (!confirmed) return;
+
+            try {
+                await axios.delete(`/api/appointments/${id}`, { withCredentials: true });
+                
+                setAppointments(prev => prev.filter(appt => appt.appointmentId !== id));
+
+                // then navigate
+                navigate('/patient-dashboard');
+            } catch (error) {
+                alert("Failed to reschedule.");
+                console.error("Reschedule error", error);
+            }
+        };
+
+        //cancel appointment
+        const handleCancel = async (id) => {
+               if (!id) {
+                    alert("Invalid appointment ID");
+                    return;
+                }
+            
+            try {
+                const confirmed = window.confirm("Are you sure you want to cancel this appointment?");
+                if (!confirmed) return;
+
+                await axios.delete(`/api/appointments/${id}`, {
+                    withCredentials: true
+                });
+                // now deleted appointment before alert
+                  setAppointments(prev => prev.filter(appt => appt.appointmentId !== id));
+
+                alert("Appointment cancelled successfully.");
+            } catch (error) {
+                console.error("Failed to cancel appointment:", error);
+                alert("Failed to cancel appointment.");
+            }
+        };
+        // initialize appointments and setAppointments
+        const [appointments, setAppointments] = useState([]);
+      
+
         return (
             <>
             {/* Top Navbar */}
@@ -43,26 +103,31 @@ import styles from '../styles/HomePage.module.css';
             </nav>
 
 
-        <div style={{ padding: '40px' }}>
-        <h2>My Appointments</h2>
-        <div style={{ marginTop: '30px' }}>
-            <div style={{ border: '2px solid #6f42c1', padding: '20px', borderRadius: '8px', marginBottom: '20px', backgroundColor: '#eee' }}>
-            <p><strong>Dr. Sarah Murphy | Cardiology</strong></p>
-            <p>12 Jul 2025, 10:30 AM</p>
-            <p>Status: Confirmed</p>
-            <button style={{ marginRight: '10px' }}>Reschedule</button>
-            <button>Cancel</button>
-            </div>
-
-            <div style={{ border: '2px solid #ccc', padding: '20px', borderRadius: '8px', backgroundColor: '#ddd' }}>
-            <p><strong>Dr. Sarah Murphy | Cardiology</strong></p>
-            <p>2 Jul 2025, 2:30 PM</p>
-            <p>Status: Confirmed</p>
-            <button style={{ marginRight: '10px' }}>Reschedule</button>
-            <button>Cancel</button>
-            </div>
-        </div>
-         </div>
+            {/* reschedule and cancel */}
+             <div className="appointments-container">
+                <h2>My Appointments</h2>
+                {appointments.length === 0 ? (
+                    <p>No appointments found.</p>
+                ) : (
+                    appointments.map((appt, index) => {
+                    console.log("Appointment object:", appt); 
+                    return (
+                        <div className="appointment-card" key={index}>
+                        <h3>{appt.doctorName} | {appt.specialty}</h3>
+                        <p>Date: {appt.appointmentDate}</p>
+                        <p>Time: {appt.startTime} - {appt.endTime}</p>
+                        <p>Status: {appt.status}</p>
+                        <div className="appointment-actions">
+                            <button onClick={() => handleReschedule(appt.appointmentId)}>Reschedule</button>
+                            <button onClick={() => handleCancel(appt.appointmentId)}>Cancel</button>
+                        </div>
+                        </div>
+                    );
+                    })
+                )}
+                </div>
+                    
+                    
                     {/* Footer section */}
                 <div className={styles["footer-section"]}>
                 <div className="container">
@@ -99,9 +164,13 @@ import styles from '../styles/HomePage.module.css';
                     {/* App Section */}
                     <div className="col-md-3">
                         <h5 className="text-white mb-3">Get the HealthFlow App</h5>
-                        <img src="/images/appstore.png" alt="App Store" className="mb-2" width="120" />
+                        <a href="https://www.apple.com/app-store/" target="_blank" rel="noopener noreferrer">
+                            <img src="/images/appstore.png" alt="App Store" className="mb-2" width="120" />
+                        </a>
                         <br />
+                        <a href="https://play.google.com/store" target="_blank" rel="noopener noreferrer">
                         <img src="/images/googleplay.png" alt="Google Play" width="120" />
+                        </a>
                     </div>
 
                     </div>

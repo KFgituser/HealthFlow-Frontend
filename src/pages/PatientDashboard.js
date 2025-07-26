@@ -5,8 +5,10 @@ import { useNavigate, Link } from "react-router-dom";  //for mapping doctors
 import styles from '../styles/HomePage.module.css';
 import '../styles/PatientDashboard.css';
 import React from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
     export default function PatientDashboard(){
+        const { currentUser } = useAuth();
         //use dummy doctor data
         const [doctors, setDoctors] = useState([
         {
@@ -105,6 +107,68 @@ import React from 'react';
         ]);
       
         const navigate = useNavigate();
+        
+        //For bookAppointment
+        const [showTimeModal, setShowTimeModal] = useState(false);
+        const [selectedDoctor, setSelectedDoctor] = useState(null);
+        const [selectedDate, setSelectedDate] = useState(null);
+        const [selectedTime, setSelectedTime] = useState('');
+        const timeSlots = [
+            "09:30", "10:00", "10:30", "11:00",
+            "13:00", "13:30", "14:00", "15:00",
+            "15:30", "16:00"
+        ];
+
+        //handle bookAppointment
+        const handleBookAppointment = (doctor, slot) => {
+            if (slot.slots === 0) return;
+            setSelectedDoctor(doctor);
+            setSelectedDate(slot.date);
+            setShowTimeModal(true);
+        };
+
+        
+        // For confirmBooking
+        const confirmBooking = () => {
+            const user = JSON.parse(localStorage.getItem("user"));
+            console.log("🧑‍⚕️ User:", user);
+            const [hour, minute] = selectedTime.split(':').map(Number);
+            const date = new Date();
+            date.setHours(hour);
+            date.setMinutes(minute + 30);
+            const endTime = date.toTimeString().slice(0, 5);  // "HH:MM"
+
+            // selectedDate
+            const [dayOfWeek, monthStr, dayStr] = selectedDate.split(' ');
+            const currentYear = new Date().getFullYear();
+            const fullDateStr = `${monthStr} ${dayStr}, ${currentYear}`; // "Jul 24, 2025"
+            const formattedDate = new Date(fullDateStr).toISOString().split("T")[0]; // "2025-07-24"
+            
+            
+           const appointment = {
+            doctorId: selectedDoctor.id,
+            patientId: currentUser.id,
+            appointmentDate: formattedDate,
+            startTime: selectedTime,
+            endTime: endTime,
+            status: "Confirmed",
+    
+            };
+
+             api.post('/api/appointments', appointment, { withCredentials: true })
+                .then(() => {
+                      alert("Appointment booked!");
+                      navigate("/appointments");
+                })
+                .catch(error => {
+                    const status = error.response?.status ?? 'unknown';
+                    const data = error.response?.data ?? 'No response data';
+                    console.error('📛 Booking failed:', status, data);
+                alert(`Booking failed. Status ${status}`);
+                });
+                
+            };
+
        
         // the map expanded:
         const [isMapExpanded, setIsMapExpanded] = useState(false);
@@ -136,7 +200,8 @@ import React from 'react';
         lat: 53.3498,  // Dublin
         lng: -6.2603,
         };
-
+        
+        
 
         return(
         <div>
@@ -239,14 +304,13 @@ import React from 'react';
                             {doctor.availability.map((slot, index) => (
                              <React.Fragment key={index}>  
                                 <div
-                                    key={index}
                                     className={`availability-button ${slot.slots === 0 ? 'no-slots' : 'has-slots'}`}
-                                    >
-                                        
-                                    <div>{slot.date}</div>
-                                    <div>{slot.slots === 0 ? 'No appts' : `${slot.slots} appts`}</div>
+                                    onClick={() => handleBookAppointment(doctor, slot)}
+                                    style={{ cursor: slot.slots > 0 ? 'pointer' : 'default' }}
+                                >
+                                <div>{slot.date}</div>
+                                <div>{slot.slots === 0 ? 'No appts' : `${slot.slots} appts`}</div>
                                 </div>
-                                
                                  {(index + 1) % 6 === 0 && <div className="w-100"></div>}
                                 </React.Fragment>
                             ))}
@@ -284,15 +348,15 @@ import React from 'react';
                         zoom={13}
                         onLoad={(map) => {
                         console.log('Map loaded successfully');
-                        // You can now safely use window.google here
+                        
                         }}
                     >
                         {/* Optional: Add markers or components inside */}
                     </GoogleMap>
                     </LoadScript>
                  </div>
-                 </div>
                 </div>
+            </div>
            
            
                 {/* Footer section */}
@@ -343,7 +407,60 @@ import React from 'react';
                 <footer className="bg-dark text-white text-center py-3">
                     <small>© 2025 HealthFlow.    Terms | Privacy </small>
                 </footer>
-             
+              {/* appointment modal */}
+             {showTimeModal && (
+        <div className="modal-backdrop">
+            <div className="modal-content">
+            <h5 className="modal-title">Book an appointment</h5>
+            <div className="appointment-info-row">
+                <p><strong>Date:</strong> {selectedDate}</p>
+                <p><strong>Doctor:</strong> {selectedDoctor?.name}</p>
+            </div>
+            <p>What time would you like to book?</p>
+
+            <div className="time-slot-list">
+                {timeSlots.map((time, i) => {
+                const isAvailable = ["09:30", "11:00", "13:30", "15:00"].includes(time);
+                const isSelected = selectedTime === time;
+
+                return (
+                    <div
+                    key={i}
+                    className={`time-slot-row ${isSelected ? 'selected' : ''}`}
+                    onClick={() => isAvailable && setSelectedTime(time)}
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        padding: '5px 8px',
+                        fontSize: '19px',
+                        backgroundColor: isSelected ? '#b2f0b2' : '#f4f4f4',
+                        color: isAvailable ? '#007500' : '#999',
+                        fontWeight: isAvailable ? '600' : 'normal',
+                        borderBottom: '1px solid #ccc',
+                        cursor: isAvailable ? 'pointer' : 'default'
+                    }}
+                    >
+                        
+                    <span>{time}</span>
+                    <span className="slot-status">{isAvailable ? 'Available' : 'no'}</span>
+                    </div>
+                );
+                })}
+            </div>
+
+            <div className="modal-buttons">
+                <button className="btn btn-success" disabled={!selectedTime} onClick={confirmBooking}>
+                Confirm booking
+                </button>
+                <button className="btn btn-secondary" onClick={() => setShowTimeModal(false)}>
+                Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+    )}
+
+       
         </div>
         )
     };
