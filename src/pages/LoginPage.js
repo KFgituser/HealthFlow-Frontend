@@ -2,6 +2,8 @@ import { useState } from 'react';
 import api from '../services/api';
 import { useNavigate, Link } from 'react-router-dom';
 import styles from '../styles/LoginPage.module.css';
+import Breadcrumb from '../components/Breadcrumb';
+import '../styles/HomePage.module.css';
 
     export default function LoginPage() {
       const [emailOrPhone, setEmailOrPhone] = useState('');
@@ -44,11 +46,10 @@ import styles from '../styles/LoginPage.module.css';
      
 
       return (
-        <div className={styles.page}>
-          
+        <div className={styles.page}>  
            {/* Top Navbar */}
-            <nav className="navbar navbar-light justify-content-between px-4 py-2">
-                
+            <div className="bg-white border-bottom">
+              <div className="container d-flex justify-content-between align-items-center" style={{ height: "108px" }}>
                 <Link to="/" className="navbar-brand d-flex align-items-center" style={{ textDecoration: 'none' }}>
                   <img
                     src="/images/logo.png"
@@ -57,11 +58,12 @@ import styles from '../styles/LoginPage.module.css';
                   />
                   <h4 className="mb-0 text-dark">HealthFlow</h4>
                 </Link>
-                <div>
+                <div className="d-flex align-items-center gap-3">
                     <Link to="/help" className="btn btn-outline-secondary me-2">Help</Link>
                     <Link to="/register" className="btn btn-outline-success">Sign Up</Link> 
                 </div>
-            </nav>
+              </div>
+            </div>
 
           {/* login form starts here */}
           <div className={styles.container2}>

@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
 import styles from '../styles/RegisterPage.module.css';
-    
+import Breadcrumb from '../components/Breadcrumb';
+import '../styles/LoginPage.module.css';
+
   export default function RegisterPage() {   
     const navigate = useNavigate();
       const [formData, setFormData] = useState({
@@ -52,31 +54,52 @@ import styles from '../styles/RegisterPage.module.css';
         }
       }
       
+      //logout  
+        const handleLogout = async () => {
+            try {
+            await fetch("http://localhost:8080/logout", {
+                method: "POST",
+                credentials: "include", // Important for session cookies
+            });
+            // Optionally clear any local state or context
+            navigate("/login");
+            } catch (error) {
+            console.error("Logout failed:", error);
+            }
+        };
       
     
 
     return (
       <div>
         <div className="container mt-4 mb-5">
-          {/* Header */}
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <Link to="/" className="navbar-brand d-flex align-items-center" style={{ textDecoration: 'none' }}>
-              <img
-                src="/images/logo.png"
-                alt="HealthFlow Logo"
-                style={{ height: "30px", marginRight: "10px", verticalAlign: "middle" }}
-              />
-              <h4 className="mb-0 text-dark">HealthFlow</h4>
-            </Link>
-            <div>
-              Already got an account?{' '}
-              <Link to="/login" className="btn btn-outline-primary btn-sm ms-2">
-                Log In
-              </Link>
+         {/* Top Navbar */}
+            <div className="bg-white border-bottom">
+              <div className="container d-flex justify-content-between align-items-center" style={{ height: "108px" }}>
+                <Link to="/" className="navbar-brand d-flex align-items-center" style={{ textDecoration: 'none' }}>
+                  <img
+                    src="/images/logo.png"
+                    alt="HealthFlow Logo"
+                    style={{ height: "30px", marginRight: "10px", verticalAlign: "middle" }}
+                  />
+                  <h4 className="mb-0 text-dark">HealthFlow</h4>
+                </Link>
+                <div className="d-flex align-items-center gap-3">
+                    <Link to="/help" className="btn btn-outline-secondary me-2">Help</Link>
+                    <Link to="/register" className="btn btn-outline-success">Sign Up</Link> 
+                </div>
+              </div>
             </div>
-          </div>
 
-          <h5 className="text-center mb-4 fw-bold">Create an account</h5>
+           {/* Breadcrumb */}
+            <Breadcrumb
+            items={[
+                { label: "Home", link: "/" },
+                { label: "Create your account" }
+            ]}
+            />
+
+          <h5 className="text-center mb-4 fw-bold mt-5 ">Create your account</h5>
           <form onSubmit={handleSubmit}>
             <div className="row mb-3">
               <div className="col">
@@ -88,7 +111,7 @@ import styles from '../styles/RegisterPage.module.css';
                 <input name="lastName" className="form-control" value={formData.lastName} onChange={handleChange} />
               </div>
             </div>
-
+          
             <div className="row mb-3">
               <div className="col">
                 <label>Date of Birth</label>

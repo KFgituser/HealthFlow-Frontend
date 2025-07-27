@@ -6,12 +6,13 @@ import styles from '../styles/HomePage.module.css';
 import '../styles/PatientDashboard.css';
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import dummyDoctors from '../data/dummyDoctors';
+import { useDoctorContext } from '../contexts/DoctorContext';
+import Breadcrumb from '../components/Breadcrumb';
 
     export default function PatientDashboard(){
         const { currentUser } = useAuth();
         //use dummy doctor data
-        const [doctors, setDoctors] = useState(dummyDoctors);
+        const { doctors, updateDoctorSlots } = useDoctorContext();
       
         const navigate = useNavigate();
         
@@ -37,8 +38,12 @@ import dummyDoctors from '../data/dummyDoctors';
         
         // For confirmBooking
         const confirmBooking = () => {
+             
+            if (!selectedDoctor || typeof selectedDoctor.id === 'undefined') {
+                alert("Error: No doctor selected.");
+                return;
+            }
             const user = JSON.parse(localStorage.getItem("user"));
-            console.log("🧑‍⚕️ User:", user);
             const [hour, minute] = selectedTime.split(':').map(Number);
             const date = new Date();
             date.setHours(hour);
@@ -64,6 +69,8 @@ import dummyDoctors from '../data/dummyDoctors';
 
              api.post('/api/appointments', appointment, { withCredentials: true })
                 .then(() => {
+                    //update slots No.
+                     updateDoctorSlots(selectedDoctor.id, formattedDate, -1);   
                       alert("Appointment booked!");
                       navigate("/appointments");
                 })
@@ -75,14 +82,15 @@ import dummyDoctors from '../data/dummyDoctors';
                 });
                 
             };
-
-       
+        
+            
         // the map expanded:
         const [isMapExpanded, setIsMapExpanded] = useState(false);
         
         //filters
         const [selectedSpecialty, setSelectedSpecialty] = useState('');
         const [selectedDistance, setSelectedDistance] = useState('');
+        const [selectedCity, setSelectedCity] = useState('');
         //logout  
         const handleLogout = async () => {
             try {
@@ -113,31 +121,41 @@ import dummyDoctors from '../data/dummyDoctors';
             const params = new URLSearchParams(location.search);
             const specialtyParam = params.get("specialty");
             const distanceParam = params.get("distance");
-
+            const cityParam = params.get("city");
+            if (cityParam) setSelectedCity(cityParam);
             if (specialtyParam) setSelectedSpecialty(specialtyParam);
             if (distanceParam) setSelectedDistance(Number(distanceParam));
+            if (cityParam) setSelectedCity(cityParam);
         }, []);
 
         return(
         <div>
             {/* Top Navbar */}
-            <nav className="navbar navbar-light justify-content-between px-4 py-2"> 
+            <div className="bg-white border-bottom">
+              <div className="container d-flex justify-content-between align-items-center" style={{ height: "108px" }}> 
                 <Link to="/" className="navbar-brand d-flex align-items-center" style={{ textDecoration: 'none' }}>
                   <img
                     src="/images/logo.png"
                     alt="HealthFlow Logo"
                     style={{ height: "30px", marginRight: "10px", verticalAlign: "middle" }}
                   />
-                  <h4 className="mb-0 text-dark">HealthFlow</h4>
+                  <h3 className="mb-0 text-dark">HealthFlow</h3>
                 </Link>
-                <div>
+                <div className="d-flex align-items-center gap-3">
                     <Link to="/appointments" className="btn btn-outline-primary me-2">My Apts</Link>
                     <Link to="/help" className="btn btn-outline-secondary me-2">Help</Link>
                     <a href="#" className="btn btn-outline-danger" onClick={handleLogout}>Log Out</a> 
                 </div>
-            </nav>
-            
-             {/* second Top bar */}
+              </div>
+            </div>
+             {/* Breadcrumb */}
+            <Breadcrumb
+            items={[
+                { label: "Home", link: "/" },
+                { label: "My Dashboard" }
+            ]}
+            />
+             {/* provider and date */}
             <div className="result-summary d-flex justify-content-between align-items-center px-4 py-3">
                  <div className="d-flex align-items-baseline gap-2">
                     <span className="summary-count">{doctors.length}</span>
@@ -181,6 +199,21 @@ import dummyDoctors from '../data/dummyDoctors';
                         <option value="5">5 km</option>
                         </select>
                     </div>
+                    <div className="form-group mb-0">
+                    <label htmlFor="citySelect" className="form-label me-2">City:</label>
+                        <select
+                            id="citySelect"
+                            className="form-select"
+                            value={selectedCity}
+                            onChange={(e) => setSelectedCity(e.target.value)}
+                            style={{ width: "180px" }}
+                        >
+                            <option value="">All</option>
+                            {["Dublin", "Cork", "Limerick", "Galway", "Waterford"].map((city, i) => (
+                            <option key={i} value={city}>{city}</option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
             <div className="main-dashboard d-flex">
                 
@@ -191,7 +224,8 @@ import dummyDoctors from '../data/dummyDoctors';
                         .filter((doctor) =>
                             (selectedSpecialty === '' || doctor.specialty .trim().toLowerCase() 
                             === selectedSpecialty.trim().toLowerCase()) &&
-                            (selectedDistance === '' || doctor.distance <= selectedDistance)
+                            (selectedDistance === '' || doctor.distance <= selectedDistance) &&
+                            (selectedCity === '' || doctor.city?.toLowerCase() === selectedCity.toLowerCase())
                         )
                         .map((doctor) => (
                     <div key={doctor.id} className="card mb-3 p-3 shadow-sm">
@@ -336,38 +370,47 @@ import dummyDoctors from '../data/dummyDoctors';
             <p>What time would you like to book?</p>
 
             <div className="time-slot-list">
-                {timeSlots.map((time, i) => {
-                const isAvailable = ["09:30", "11:00", "13:30", "15:00"].includes(time);
-                const isSelected = selectedTime === time;
+  {(() => {
+    const todaySlot = selectedDoctor?.availability.find(slot => slot.date === selectedDate);
+    const times = todaySlot?.times || [];
 
-                return (
-                    <div
-                    key={i}
-                    className={`time-slot-row ${isSelected ? 'selected' : ''}`}
-                    onClick={() => isAvailable && setSelectedTime(time)}
-                    style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        padding: '5px 8px',
-                        fontSize: '19px',
-                        backgroundColor: isSelected ? '#b2f0b2' : '#f4f4f4',
-                        color: isAvailable ? '#007500' : '#999',
-                        fontWeight: isAvailable ? '600' : 'normal',
-                        borderBottom: '1px solid #ccc',
-                        cursor: isAvailable ? 'pointer' : 'default'
-                    }}
-                    >
-                        
-                    <span>{time}</span>
-                    <span className="slot-status">{isAvailable ? 'Available' : 'no'}</span>
-                    </div>
-                );
-                })}
-            </div>
+    return timeSlots.map((time, i) => {
+      const match = times.find(t => t.time === time);
+      const isAvailable = match?.available || false;
+      const isSelected = selectedTime === time;
+
+      return (
+        <div
+          key={i}
+          className={`time-slot-row ${isSelected ? 'selected' : ''}`}
+          onClick={() => isAvailable && setSelectedTime(time)}
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            padding: '5px 8px',
+            fontSize: '19px',
+            backgroundColor: isSelected ? '#b2f0b2' : '#f4f4f4',
+            color: isAvailable ? '#007500' : '#999',
+            fontWeight: isAvailable ? '600' : 'normal',
+            borderBottom: '1px solid #ccc',
+            cursor: isAvailable ? 'pointer' : 'default'
+          }}
+        >
+          <span>{time}</span>
+          <span className="slot-status">{isAvailable ? 'Available' : 'no'}</span>
+        </div>
+      );
+    });
+  })()}
+</div>
 
             <div className="modal-buttons">
-                <button className="btn btn-success" disabled={!selectedTime} onClick={confirmBooking}>
-                Confirm booking
+                <button
+                    className="btn btn-success"
+                    disabled={!selectedDoctor || !selectedDate || !selectedTime}
+                    onClick={confirmBooking}
+                    >
+                    Confirm booking
                 </button>
                 <button className="btn btn-secondary" onClick={() => setShowTimeModal(false)}>
                 Cancel

@@ -4,10 +4,12 @@ import styles from '../styles/HomePage.module.css';
 import '../styles/Appointments.css';
 import axios from 'axios';
 import dummyDoctors from '../data/dummyDoctors';
+import { useDoctorContext } from '../contexts/DoctorContext';
+import Breadcrumb from '../components/Breadcrumb';
 
     const Appointment = () => {
         const navigate = useNavigate();
-        const [doctors, setDoctors] = useState(dummyDoctors);
+        const { doctors, updateDoctorSlots } = useDoctorContext();
         //logout  
         const handleLogout = async () => {
             try {
@@ -65,11 +67,21 @@ import dummyDoctors from '../data/dummyDoctors';
             try {
                 const confirmed = window.confirm("Are you sure you want to cancel this appointment?");
                 if (!confirmed) return;
+                //Extract the doctorId and appointmentDate for restoring the slot
+                const cancelledAppointment = appointments.find(appt => appt.appointmentId === id);
+                if (!cancelledAppointment) {
+                alert("Appointment not found.");
+                return;
+                }
 
+                const doctorId = cancelledAppointment.doctor?.id || cancelledAppointment.doctorId;
+                const appointmentDate = cancelledAppointment.appointmentDate;
                 await axios.delete(`/api/appointments/${id}`, {
                     withCredentials: true
                 });
-                // now deleted appointment before alert
+                //First update the slots (+1)
+                updateDoctorSlots(doctorId, appointmentDate, +1);
+                // then update the appointment status
                   setAppointments(prev => prev.filter(appt => appt.appointmentId !== id));
 
                 alert("Appointment cancelled successfully.");
@@ -78,32 +90,41 @@ import dummyDoctors from '../data/dummyDoctors';
                 alert("Failed to cancel appointment.");
             }
         };
+       
         // initialize appointments and setAppointments
         const [appointments, setAppointments] = useState([]);
       
-
+        
 
         return (
             <>
             {/* Top Navbar */}
-            <nav className="navbar navbar-light justify-content-between px-4 py-2"> 
+           <div className="bg-white border-bottom">
+              <div className="container d-flex justify-content-between align-items-center" style={{ height: "108px" }}>
                 <Link to="/" className="navbar-brand d-flex align-items-center" style={{ textDecoration: 'none' }}>
                   <img
                     src="/images/logo.png"
                     alt="HealthFlow Logo"
                     style={{ height: "30px", marginRight: "10px", verticalAlign: "middle" }}
                   />
-                  <h4 className="mb-0 text-dark">HealthFlow</h4>
+                  <h3 className="mb-0 text-dark">HealthFlow</h3>
                 </Link>
-                <div>
+                <div className="d-flex align-items-center gap-3">
                     <Link to="/patient-dashboard" className="btn btn-outline-primary me-2">
                         My Dashboard
                     </Link>
                     <Link to="/help" className="btn btn-outline-secondary me-2">Help</Link>
                     <a href="#" className="btn btn-outline-danger" onClick={handleLogout}>Log Out</a> 
                 </div>
-            </nav>
-
+              </div>
+            </div>
+              {/* Breadcrumb */}
+            <Breadcrumb
+            items={[
+                { label: "Home", link: "/" },
+                { label: "My Appointments" }
+            ]}
+            />
 
             {/* reschedule and cancel */}
              <div className="appointments-container">

@@ -4,12 +4,15 @@ import styles from '../styles/HomePage.module.css';
 import { useAuth } from '../contexts/AuthContext';
 import { useState } from 'react';
 import symptomToSpecialtyMap from '../data/symptomToSpecialtyMap';
+import Breadcrumb from '../components/Breadcrumb';
+
 
 export default function HomePage() {
      const { currentUser, logout } = useAuth();
-    //navigation
+    //filters and navigation
     const [specialty, setSpecialty] = useState('');
     const [location, setLocation] = useState('');
+    const [city, setCity] = useState('');
     const navigate = useNavigate();
 
     const handleSearch = () => {
@@ -28,7 +31,7 @@ export default function HomePage() {
         const query = new URLSearchParams();
         if (resolvedSpecialty) query.append("specialty", resolvedSpecialty);
         if (location) query.append("distance", location);
-
+        if (city) query.append("city", city);
         navigate(`/dashboard?${query.toString()}`);
         };
 
@@ -37,9 +40,8 @@ export default function HomePage() {
     return (
         <div>
             {/* Top Navbar */}
-        
-            <nav className="navbar navbar-light justify-content-between px-4 py-2">
-                
+            <div className="bg-white border-bottom">
+              <div className="container d-flex justify-content-between align-items-center" style={{ height: "108px" }}>
                 <Link to="/" className="navbar-brand d-flex align-items-center" style={{ textDecoration: 'none' }}>
                   <img
                     src="/images/logo.png"
@@ -48,7 +50,7 @@ export default function HomePage() {
                   />
                   <h4 className="mb-0 text-dark">HealthFlow</h4>
                 </Link>
-               <div>
+               <div className="d-flex align-items-center gap-3">
                 {currentUser && (
                     <Link to="/appointments" className="btn btn-outline-primary me-2">My Apts</Link>
                 )}
@@ -65,7 +67,10 @@ export default function HomePage() {
                     </>
                 )}
                 </div>
-            </nav>
+             </div>
+            </div>
+            
+           
 
             <div className="container mt-5">
             <h2 className="mb-3">Find your doctor</h2>
@@ -81,19 +86,31 @@ export default function HomePage() {
                                 onChange={(e) => setSpecialty(e.target.value)}
                             />
                         </div>
-                         <div className="col-md-4">
-                        <div className="d-flex align-items-center border rounded px-2" style={{  height: "47px" }}>
-                            <FaMapMarkerAlt className="me-2 text-muted" />
-                            <input
-                                type="text"
-                                className="form-control border-0 p-0"
-                                placeholder="Distance(km) or Location (Eircode)"
-                                style={{ boxShadow: "none" }}
-                                value={location}
-                                onChange={(e) => setLocation(e.target.value)}
-                            />
-                        </div>
-                       </div> 
+                         <div className="col-md-2">
+                            <div className="d-flex align-items-center border rounded px-2" style={{  height: "47px" }}>
+                                <FaMapMarkerAlt className="me-2 text-muted" />
+                                <input
+                                    type="text"
+                                    className="form-control border-0 p-0"
+                                    placeholder="Distance(km)"
+                                    style={{ boxShadow: "none" }}
+                                    value={location}
+                                    onChange={(e) => setLocation(e.target.value)}
+                                />
+                            </div>
+                         </div> 
+                         <div className="col-md-2">
+                            <select
+                                className="form-select"
+                                value={city}
+                                onChange={(e) => setCity(e.target.value)}
+                            >
+                                <option value="">All Cities</option>
+                                {["Dublin", "Cork", "Limerick", "Galway", "Waterford"].map((c, i) => (
+                                <option key={i} value={c}>{c}</option>
+                                ))}
+                            </select>
+                         </div>
                         <div className="col-md-2">
                             <button className="btn btn-primary w-100" onClick={handleSearch}>
                                 Find a Match

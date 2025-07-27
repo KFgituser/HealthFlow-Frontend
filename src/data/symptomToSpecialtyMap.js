@@ -7,7 +7,7 @@
     "itching": "Dermatology",
     "dry skin": "Dermatology",
     "mole check": "Dermatology",
-    "skin allergy": "Dermatology",
+    "allergy": "Dermatology",
 
     // Cardiology
     "chest pain": "Cardiology",

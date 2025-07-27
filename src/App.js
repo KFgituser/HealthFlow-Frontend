@@ -15,6 +15,7 @@ import logo from './logo.svg';
 import './App.css';
 
 import Appointment from './pages/Appointment';
+import { DoctorProvider } from './contexts/DoctorContext';
 
 
 
@@ -24,6 +25,7 @@ function App() {
 
   return (
     <AuthProvider>
+      <DoctorProvider>
       <Routes>
         <Route path="/" element={<HomePage></HomePage>} />
         <Route path="/login" element={<LoginPage></LoginPage>} />
@@ -37,6 +39,7 @@ function App() {
         
         {/* add more routes here */}
       </Routes>
+      </DoctorProvider>
     </AuthProvider>
   );
 }
