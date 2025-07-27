@@ -9,6 +9,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useDoctorContext } from '../contexts/DoctorContext';
 import Breadcrumb from '../components/Breadcrumb';
 
+
     export default function PatientDashboard(){
         const { currentUser } = useAuth();
         //use dummy doctor data
@@ -94,7 +95,7 @@ import Breadcrumb from '../components/Breadcrumb';
         //logout  
         const handleLogout = async () => {
             try {
-            await fetch("http://localhost:8080/logout", {
+            await fetch(`${process.env.REACT_APP_BACKEND_URL}/logout`, {
                 method: "POST",
                 credentials: "include", // Important for session cookies
             });

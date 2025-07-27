@@ -29,7 +29,7 @@ export default function DoctorDashboard(){
 
     const handleLogout = async () => {
             try {
-            await fetch("http://localhost:8080/logout", {
+            await fetch(`${process.env.REACT_APP_BACKEND_URL}/logout`,  {
                 method: "POST",
                 credentials: "include", // Important for session cookies
             });

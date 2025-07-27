@@ -13,7 +13,7 @@ import Breadcrumb from '../components/Breadcrumb';
         //logout  
         const handleLogout = async () => {
             try {
-            await fetch("http://localhost:8080/logout", {
+            await fetch(`${process.env.REACT_APP_BACKEND_URL}/logout`,{
                 method: "POST",
                 credentials: "include", // for session cookies
             });
@@ -29,7 +29,7 @@ import Breadcrumb from '../components/Breadcrumb';
             if (!user) return;
 
             console.log("User:", user);
-            axios.get(`/api/appointments/user/${user.id}`, {
+            axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/appointments/user/${user.id}`, {
                 withCredentials: true
             })
                 .then(response => {
@@ -45,7 +45,7 @@ import Breadcrumb from '../components/Breadcrumb';
             if (!confirmed) return;
 
             try {
-                await axios.delete(`/api/appointments/${id}`, { withCredentials: true });
+                await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/appointments/${id}`, { withCredentials: true });
                 
                 setAppointments(prev => prev.filter(appt => appt.appointmentId !== id));
 
@@ -76,7 +76,7 @@ import Breadcrumb from '../components/Breadcrumb';
 
                 const doctorId = cancelledAppointment.doctor?.id || cancelledAppointment.doctorId;
                 const appointmentDate = cancelledAppointment.appointmentDate;
-                await axios.delete(`/api/appointments/${id}`, {
+                await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/appointments/${id}`, {
                     withCredentials: true
                 });
                 //First update the slots (+1)
