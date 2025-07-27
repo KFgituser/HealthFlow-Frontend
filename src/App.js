@@ -26,19 +26,21 @@ function App() {
   return (
     <AuthProvider>
       <DoctorProvider>
-      <Routes>
-        <Route path="/" element={<HomePage></HomePage>} />
-        <Route path="/login" element={<LoginPage></LoginPage>} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/patient-dashboard" element={<PatientDashboard />} />
-        <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
-        <Route path="/doctor/:id" element={<DoctorCard />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route path="/appointments" element={<Appointment />} />
-        <Route path="/dashboard" element={<PatientDashboard />} />
-        
-        {/* add more routes here */}
-      </Routes>
+        <Router>
+        <Routes>
+          <Route path="/" element={<HomePage></HomePage>} />
+          <Route path="/login" element={<LoginPage></LoginPage>} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/patient-dashboard" element={<PatientDashboard />} />
+          <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
+          <Route path="/doctor/:id" element={<DoctorCard />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/appointments" element={<Appointment />} />
+          <Route path="/dashboard" element={<PatientDashboard />} />
+          
+          {/* add more routes here */}
+        </Routes>
+      </Router>
       </DoctorProvider>
     </AuthProvider>
   );
