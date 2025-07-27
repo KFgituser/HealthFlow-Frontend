@@ -7,8 +7,17 @@ const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser, ] = useState(null);
 
+    //Initialization
+    useEffect(() => {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        setCurrentUser(JSON.parse(storedUser));
+      }
+    }, []);
+
+    
     // Check session on mount
     useEffect(() => {
     console.log("🔍 AuthContext mounted");
@@ -50,7 +59,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-      <AuthContext.Provider value={{currentUser, setCurrentUser }}>
+      <AuthContext.Provider value={{currentUser, setCurrentUser,logout}}>
         {children}
       </AuthContext.Provider>
     );

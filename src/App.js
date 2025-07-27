@@ -15,6 +15,9 @@ import logo from './logo.svg';
 import './App.css';
 
 import Appointment from './pages/Appointment';
+
+
+
 function App() {
   // keep logged in
   
@@ -30,6 +33,7 @@ function App() {
         <Route path="/doctor/:id" element={<DoctorCard />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/appointments" element={<Appointment />} />
+        <Route path="/dashboard" element={<PatientDashboard />} />
         
         {/* add more routes here */}
       </Routes>

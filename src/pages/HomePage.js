@@ -1,14 +1,43 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import styles from '../styles/HomePage.module.css';
 import { useAuth } from '../contexts/AuthContext';
+import { useState } from 'react';
+import symptomToSpecialtyMap from '../data/symptomToSpecialtyMap';
 
 export default function HomePage() {
-     const { user, logout } = useAuth();
+     const { currentUser, logout } = useAuth();
+    //navigation
+    const [specialty, setSpecialty] = useState('');
+    const [location, setLocation] = useState('');
+    const navigate = useNavigate();
+
+    const handleSearch = () => {
+        const formatSpecialty = (str) =>
+            str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
+        let resolvedSpecialty = specialty.trim().toLowerCase();
+
+        //Mapping:symptom keywords => specialty names
+        if (symptomToSpecialtyMap[resolvedSpecialty]) {
+            resolvedSpecialty = symptomToSpecialtyMap[resolvedSpecialty];
+        } else {
+            resolvedSpecialty = formatSpecialty(specialty);
+        }
+
+        const query = new URLSearchParams();
+        if (resolvedSpecialty) query.append("specialty", resolvedSpecialty);
+        if (location) query.append("distance", location);
+
+        navigate(`/dashboard?${query.toString()}`);
+        };
+
+    
+
     return (
         <div>
             {/* Top Navbar */}
-            
+        
             <nav className="navbar navbar-light justify-content-between px-4 py-2">
                 
                 <Link to="/" className="navbar-brand d-flex align-items-center" style={{ textDecoration: 'none' }}>
@@ -20,14 +49,14 @@ export default function HomePage() {
                   <h4 className="mb-0 text-dark">HealthFlow</h4>
                 </Link>
                <div>
-                {user && (
+                {currentUser && (
                     <Link to="/appointments" className="btn btn-outline-primary me-2">My Apts</Link>
                 )}
                 <Link to="/help" className="btn btn-outline-secondary me-2">Help</Link>
-                {user ? (
+                {currentUser ? (
                     <>
-                    <span className="me-2">Hi, {user.firstName}!</span>
-                    <a href="#" onClick={logout} className="btn btn-outline-danger">Log Out</a>
+                    <span className="me-2">Hi, {currentUser.firstName}!</span>
+                    <button className="btn btn-outline-danger" onClick={logout}>Log Out</button>
                     </>
                 ) : (
                     <>
@@ -43,22 +72,32 @@ export default function HomePage() {
             {/* Search Section */}
                 <div className="container my-5">
                     <div className="row mb-3">
-                        <div className="col-md-5">
-                            <input type="text" className="form-control" placeholder="Condition or Specialty" />
+                       <div className="col-md-5" >
+                            <input
+                                type="text"
+                                className="form-control"
+                                placeholder="Condition or Specialty"
+                                value={specialty}
+                                onChange={(e) => setSpecialty(e.target.value)}
+                            />
                         </div>
-                        
-                         <div className="d-flex align-items-center border rounded px-2" style={{ maxWidth: "450px", height: "47px" }}>
+                         <div className="col-md-4">
+                        <div className="d-flex align-items-center border rounded px-2" style={{  height: "47px" }}>
                             <FaMapMarkerAlt className="me-2 text-muted" />
                             <input
                                 type="text"
                                 className="form-control border-0 p-0"
-                                placeholder="Location (Eircode or city)"
+                                placeholder="Distance(km) or Location (Eircode)"
                                 style={{ boxShadow: "none" }}
+                                value={location}
+                                onChange={(e) => setLocation(e.target.value)}
                             />
                         </div>
-                        
+                       </div> 
                         <div className="col-md-2">
-                            <button className="btn btn-primary w-100">Find a Match</button>
+                            <button className="btn btn-primary w-100" onClick={handleSearch}>
+                                Find a Match
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -69,11 +108,15 @@ export default function HomePage() {
                 <h5 className="fw-bold">News, Activities and Website Promotion</h5>
                 <p>Stay tuned for the latest updates and health tips.</p>
             </div>
-                        {/* Footer section */}
+                
+                
+            {/* Footer section */}
             <div className={styles["footer-section"]}>
             <div className="container">
                 <div className="row">
-            {/* Footer1 */}
+            
+            
+             {/* Footer1 */}
                 {/* HealthFlow Section */}
                 <div className="col-md-2">
                     <h5 className="text-white mb-3">HealthFlow</h5>

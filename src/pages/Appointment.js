@@ -3,10 +3,11 @@ import { useNavigate, Link } from "react-router-dom";
 import styles from '../styles/HomePage.module.css';
 import '../styles/Appointments.css';
 import axios from 'axios';
+import dummyDoctors from '../data/dummyDoctors';
 
     const Appointment = () => {
         const navigate = useNavigate();
-  
+        const [doctors, setDoctors] = useState(dummyDoctors);
         //logout  
         const handleLogout = async () => {
             try {
@@ -81,6 +82,7 @@ import axios from 'axios';
         const [appointments, setAppointments] = useState([]);
       
 
+
         return (
             <>
             {/* Top Navbar */}
@@ -105,22 +107,56 @@ import axios from 'axios';
 
             {/* reschedule and cancel */}
              <div className="appointments-container">
-                <h2>My Appointments</h2>
+                <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>My Appointments</h2>
                 {appointments.length === 0 ? (
                     <p>No appointments found.</p>
                 ) : (
                     appointments.map((appt, index) => {
                     console.log("Appointment object:", appt); 
+                    const doctorId = appt.doctor?.id || appt.doctorId;
+                    const doctor = dummyDoctors.find(doc => doc.id === doctorId);
+                    
                     return (
-                        <div className="appointment-card" key={index}>
-                        <h3>{appt.doctorName} | {appt.specialty}</h3>
-                        <p>Date: {appt.appointmentDate}</p>
-                        <p>Time: {appt.startTime} - {appt.endTime}</p>
-                        <p>Status: {appt.status}</p>
-                        <div className="appointment-actions">
+                     <div
+                        className="appointment-card d-flex align-items-center justify-content-center gap-5"
+                        style={{
+                            padding: '20px',
+                            marginBottom: '16px',
+                            borderRadius: '12px'
+                        }}
+                        key={index}
+                        >
+                        
+                        {/* left side */}
+                        <div>
+                            <h3>
+                            {doctor ? (
+                                <>
+                                <span style={{ fontWeight: '600' }}>{doctor.name}</span>
+                                <span style={{ fontSize: '0.65em', fontWeight: '500' }}> | {doctor.specialty}</span>
+                                </>
+                            ) : (
+                                "Doctor Info Not Available"
+                            )}
+                            </h3>
+                            <p>Date: {appt.appointmentDate}</p>
+                            <p>Time: {appt.startTime} - {appt.endTime}</p>
+                            <p>Status: {appt.status}</p>
+                            <div className="appointment-actions">
                             <button onClick={() => handleReschedule(appt.appointmentId)}>Reschedule</button>
                             <button onClick={() => handleCancel(appt.appointmentId)}>Cancel</button>
+                            </div>
                         </div>
+
+                        {/* right side */}
+                        {doctor && (
+                            <img
+                            src={doctor.imageUrl || '/images/default-doctor.png'}
+                            alt={doctor.name}
+                            className="rounded-circle"
+                            style={{ width: '300px', height: '300px', objectFit: 'cover' }}
+                            />
+                        )}
                         </div>
                     );
                     })
