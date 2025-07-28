@@ -7,11 +7,11 @@ import DoctorDashboard from './pages/DoctorDashboard';
 import DoctorCard from './pages/DoctorCard';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 
-import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
+import { BrowserRouter as Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext'
 
-import logo from './logo.svg';
+
 import './App.css';
 
 import Appointment from './pages/Appointment';
@@ -26,7 +26,7 @@ function App() {
   return (
     <AuthProvider>
       <DoctorProvider>
-        <Router>
+        
         <Routes>
           <Route path="/" element={<HomePage></HomePage>} />
           <Route path="/login" element={<LoginPage></LoginPage>} />
@@ -40,7 +40,7 @@ function App() {
           
           {/* add more routes here */}
         </Routes>
-      </Router>
+     
       </DoctorProvider>
     </AuthProvider>
   );
