@@ -4,8 +4,10 @@ import api from '../services/api';
 import styles from '../styles/RegisterPage.module.css';
 import Breadcrumb from '../components/Breadcrumb';
 import '../styles/LoginPage.module.css';
+import axios from 'axios';
 
   export default function RegisterPage() {   
+    const API_BASE = process.env.REACT_APP_BACKEND_URL;
     const navigate = useNavigate();
       const [formData, setFormData] = useState({
           firstName: '',
@@ -42,7 +44,7 @@ import '../styles/LoginPage.module.css';
           // Step 2: Remove confirmPassword before sending
         try {
           // POST to backend endpoint Step 3: Send only userData (without confirmPassword)
-          await api.post('/api/users/register', userData, {
+          await axios.post(`${API_BASE}/api/users/register`, userData, {
             withCredentials: false, // override just for this request
           });  // POST to backend
 
@@ -57,7 +59,7 @@ import '../styles/LoginPage.module.css';
       //logout  
         const handleLogout = async () => {
             try {
-            await fetch(`${process.env.REACT_APP_BACKEND_URL}/logout`,{
+            await fetch(`${API_BASE}/logout`,{
                 method: "POST",
                 credentials: "include", // Important for session cookies
             });

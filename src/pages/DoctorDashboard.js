@@ -7,6 +7,7 @@ import '../styles/DoctorDashboard.css'
 import AddAvailabilityForm from '../components/AddAvailabilityForm';
 
 export default function DoctorDashboard(){
+    const API_BASE = process.env.REACT_APP_BACKEND_URL;
     const navigate = useNavigate();
     const [doctors, setDoctors] = useState([]);
     const [view, setView] = useState('dashboard'); // or 'viewSchedule', 'editSlot'
@@ -22,14 +23,14 @@ export default function DoctorDashboard(){
 
 
     useEffect(() => {
-      api.get('/doctors')
+      api.get(`${API_BASE}/doctors`)
         .then(res => setDoctors(res.data))
         .catch(err => console.error(err));
     }, []);
 
     const handleLogout = async () => {
             try {
-            await fetch(`${process.env.REACT_APP_BACKEND_URL}/logout`,  {
+            await fetch(`https://healthflow-backend-31oy.onrender.com/api/users/logout`, {
                 method: "POST",
                 credentials: "include", // Important for session cookies
             });

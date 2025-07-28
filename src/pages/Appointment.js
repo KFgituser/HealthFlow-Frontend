@@ -8,12 +8,13 @@ import { useDoctorContext } from '../contexts/DoctorContext';
 import Breadcrumb from '../components/Breadcrumb';
 
     const Appointment = () => {
+        const API_BASE = process.env.REACT_APP_BACKEND_URL;
         const navigate = useNavigate();
         const { doctors, updateDoctorSlots } = useDoctorContext();
         //logout  
         const handleLogout = async () => {
             try {
-            await fetch(`${process.env.REACT_APP_BACKEND_URL}/logout`,{
+            await fetch(`https://healthflow-backend-31oy.onrender.com/api/users/logout`,{
                 method: "POST",
                 credentials: "include", // for session cookies
             });

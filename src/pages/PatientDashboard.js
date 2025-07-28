@@ -11,6 +11,7 @@ import Breadcrumb from '../components/Breadcrumb';
 
 
     export default function PatientDashboard(){
+         const API_BASE = process.env.REACT_APP_BACKEND_URL;
         const { currentUser } = useAuth();
         //use dummy doctor data
         const { doctors, updateDoctorSlots } = useDoctorContext();
@@ -95,7 +96,7 @@ import Breadcrumb from '../components/Breadcrumb';
         //logout  
         const handleLogout = async () => {
             try {
-            await fetch(`${process.env.REACT_APP_BACKEND_URL}/logout`, {
+            await fetch(`https://healthflow-backend-31oy.onrender.com/api/users/logout`, {
                 method: "POST",
                 credentials: "include", // Important for session cookies
             });

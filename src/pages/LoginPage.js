@@ -4,24 +4,27 @@ import { useNavigate, Link } from 'react-router-dom';
 import styles from '../styles/LoginPage.module.css';
 import Breadcrumb from '../components/Breadcrumb';
 import '../styles/HomePage.module.css';
-
+import axios from 'axios';
     export default function LoginPage() {
-      const [emailOrPhone, setEmailOrPhone] = useState('');
+      const [email, setEmail] = useState('');
       const [password, setPassword] = useState('');
       const navigate = useNavigate();
 
       async function handleLogin(e) {
         e.preventDefault();
         console.log('📤 Sending login request to backend...');
+        console.log("🔍 emailOrPhone:", email);
+console.log("🔍 password:", password);
         try {
-          const response = await api.post('/api/users/auth/login', {
-            login: emailOrPhone.trim(),
-            password: password.trim()
+          const response = await axios.post("http://localhost:8080/api/users/login", {
+            email: email,  
+            password: password 
           }, {
+            withCredentials: true ,
             headers: {
               'Content-Type': 'application/json'
             },
-            withCredentials: true  
+  
           });
           const { token, role, ...user } = response.data;
           // Save token for later requests
@@ -37,8 +40,8 @@ import '../styles/HomePage.module.css';
           }
           
         } catch (err) {
-          console.error(err);
-          console.log('❌ Login error details:', err.response?.data || err.message);
+          console.error("❌ 错误状态码:", err.response?.status);
+        console.error("❌ 错误信息:", err.response?.data || err.message);
           alert('Login failed!');
         }
       }
@@ -73,9 +76,9 @@ import '../styles/HomePage.module.css';
                 <label>Email or Phone </label>
                 <input
                   type="email"
-                  placeholder="Email or Phone"
-                  value={emailOrPhone}
-                  onChange={(e) => setEmailOrPhone(e.target.value)}
+                  placeholder="Enter your email "
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div className="mb-3">

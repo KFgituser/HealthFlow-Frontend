@@ -3,10 +3,11 @@ import { useNavigate, Link } from 'react-router-dom';
 
 import styles from '../styles/ResetPasswordPage.module.css';
 import Breadcrumb from '../components/Breadcrumb';
-
+import axios from 'axios';
 
         export default function ResetPasswordPage() {
-        const navigate = useNavigate();
+        const API_BASE = process.env.REACT_APP_BACKEND_URL;
+          const navigate = useNavigate();
         const [formData, setFormData] = useState({
             emailOrPhone: '',
             verificationCode: '',
@@ -18,15 +19,27 @@ import Breadcrumb from '../components/Breadcrumb';
             setFormData({ ...formData, [e.target.name]: e.target.value });
         }
 
-        function handleSubmit(e) {
-            e.preventDefault();
-            if (formData.newPassword !== formData.confirmPassword) {
+        async function handleSubmit(e) {
+          e.preventDefault();
+
+          if (formData.newPassword !== formData.confirmPassword) {
             alert('Passwords do not match!');
             return;
-            }
-            // call backend API here
-            alert('Password reset request submitted!');
+          }
+
+          try {
+            await axios.post(`${API_BASE}/api/users/reset-password`, {
+              emailOrPhone: formData.emailOrPhone,
+              verificationCode: formData.verificationCode,
+              newPassword: formData.newPassword
+            });
+
+            alert('Password reset successfully!');
             navigate('/login');
+          } catch (error) {
+            console.error("Reset failed:", error.response?.data || error.message);
+            alert('Reset failed!');
+          }
         }
 
         return (
