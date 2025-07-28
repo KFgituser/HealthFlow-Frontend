@@ -6,6 +6,7 @@ import Breadcrumb from '../components/Breadcrumb';
 import '../styles/HomePage.module.css';
 import axios from 'axios';
     export default function LoginPage() {
+      const API_BASE = process.env.REACT_APP_BACKEND_URL;
       const [email, setEmail] = useState('');
       const [password, setPassword] = useState('');
       const navigate = useNavigate();
@@ -16,7 +17,7 @@ import axios from 'axios';
         console.log("🔍 emailOrPhone:", email);
 console.log("🔍 password:", password);
         try {
-          const response = await axios.post("http://localhost:8080/api/users/login", {
+         const response = await axios.post(`${API_BASE}/api/users/login`, {
             email: email,  
             password: password 
           }, {

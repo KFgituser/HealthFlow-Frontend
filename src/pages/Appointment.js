@@ -14,7 +14,7 @@ import Breadcrumb from '../components/Breadcrumb';
         //logout  
         const handleLogout = async () => {
             try {
-            await fetch(`https://healthflow-backend-31oy.onrender.com/api/users/logout`,{
+            await fetch(`${API_BASE}/api/users/logout`,{
                 method: "POST",
                 credentials: "include", // for session cookies
             });
@@ -30,7 +30,7 @@ import Breadcrumb from '../components/Breadcrumb';
             if (!user) return;
 
             console.log("User:", user);
-            axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/appointments/user/${user.id}`, {
+            axios.get(`${API_BASE}/api/appointments/user/${user.id}`, {
                 withCredentials: true
             })
                 .then(response => {
@@ -46,7 +46,7 @@ import Breadcrumb from '../components/Breadcrumb';
             if (!confirmed) return;
 
             try {
-                await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/appointments/${id}`, { withCredentials: true });
+                await axios.delete(`${API_BASE}/api/appointments/${id}`, { withCredentials: true });
                 
                 setAppointments(prev => prev.filter(appt => appt.appointmentId !== id));
 
