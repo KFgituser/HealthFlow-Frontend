@@ -8,7 +8,7 @@ import DoctorCard from './pages/DoctorCard';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 
 
-import { BrowserRouter as Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext'
 
 
@@ -37,7 +37,7 @@ function App() {
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/appointments" element={<Appointment />} />
           <Route path="/dashboard" element={<PatientDashboard />} />
-          
+
           {/* add more routes here */}
         </Routes>
      
