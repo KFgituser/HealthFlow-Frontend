@@ -69,7 +69,7 @@ import Breadcrumb from '../components/Breadcrumb';
     
             };
 
-             api.post('/api/appointments', appointment, { withCredentials: true })
+             api.post(`${API_BASE}/api/appointments`, appointment, { withCredentials: true })
                 .then(() => {
                     //update slots No.
                      updateDoctorSlots(selectedDoctor.id, formattedDate, -1);   
@@ -96,7 +96,7 @@ import Breadcrumb from '../components/Breadcrumb';
         //logout  
         const handleLogout = async () => {
             try {
-            await fetch(`https://healthflow-backend-31oy.onrender.com/api/users/logout`, {
+            await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users/logout`, {
                 method: "POST",
                 credentials: "include", // Important for session cookies
             });

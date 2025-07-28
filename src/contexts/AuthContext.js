@@ -7,6 +7,7 @@ const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
+  const API_BASE = process.env.REACT_APP_BACKEND_URL;
   const [currentUser, setCurrentUser, ] = useState(null);
 
     //Initialization
@@ -23,7 +24,7 @@ export const AuthProvider = ({ children }) => {
     console.log("🔍 AuthContext mounted");
     const checkSession = async () => {
       try {
-        const res = await fetch("http://localhost:8080/api/users/session-check", {
+        const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users/session-check`, {
           credentials: "include",
         });
 
@@ -48,7 +49,7 @@ export const AuthProvider = ({ children }) => {
 
     const logout = async () => {
       try {
-        await fetch("http://localhost:8080/api/users/logout", {
+        await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users/logout`, {
           method: "POST",
           credentials: "include",
         });
