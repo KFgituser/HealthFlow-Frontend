@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
 
     //Initialization
     useEffect(() => {
-      const storedUser = localStorage.getItem("user");
+      
      try {
       const storedUser = localStorage.getItem("user");
         if (storedUser && storedUser !== "undefined") {
