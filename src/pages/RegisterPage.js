@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import api from '../services/api';
+
 import styles from '../styles/RegisterPage.module.css';
 import Breadcrumb from '../components/Breadcrumb';
 import '../styles/LoginPage.module.css';
@@ -56,19 +56,7 @@ import axios from 'axios';
         }
       }
       
-      //logout  
-        const handleLogout = async () => {
-            try {
-            await fetch(`${API_BASE}/logout`,{
-                method: "POST",
-                credentials: "include", // Important for session cookies
-            });
-            // Optionally clear any local state or context
-            navigate("/login");
-            } catch (error) {
-            console.error("Logout failed:", error);
-            }
-        };
+      
       
     
 

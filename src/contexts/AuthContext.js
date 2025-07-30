@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem("user"); 
         setCurrentUser(null);
       }
-    }, []);
+    }, [API_BASE]);
 
     
     // Check session on mount
@@ -54,7 +54,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     checkSession();
-  }, []);
+  }, [API_BASE]);
 
     const logout = async () => {
       try {
