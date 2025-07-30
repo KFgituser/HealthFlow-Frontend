@@ -1,45 +1,36 @@
-import React, { createContext, useState, useContext } from 'react';
-import dummyDoctors from '../data/dummyDoctors';
+import React, { createContext, useContext, useState, useEffect } from "react";
 
+// 创建上下文
 const DoctorContext = createContext();
 
+// Hook 简化使用
+export const useDoctors = () => useContext(DoctorContext);
+
+// Provider 包裹全局
 export const DoctorProvider = ({ children }) => {
-     localStorage.removeItem("doctors");
-  const initialDoctors = JSON.parse(localStorage.getItem("doctors")) || dummyDoctors;
-  const [doctors, setDoctors] = useState(initialDoctors);
+  const [doctors, setDoctors] = useState([]);
 
-  const updateDoctorSlots = (doctorId, dateStr, delta) => {
-    setDoctors(prevDoctors => {
-      const updated = prevDoctors.map(doc => {
-        if (doc.id !== doctorId) return doc;
-
-        return {
-          ...doc,
-          availability: doc.availability.map(slot => {
-            const parsedSlotDate = new Date(`${slot.date}, ${new Date().getFullYear()}`);
-            const formattedSlotDate = parsedSlotDate.toISOString().split("T")[0];
-
-            if (formattedSlotDate === dateStr) {
-              console.log(`✅ Matching slot found for doctor ${doctorId} on ${dateStr}, updating ${slot.slots} ➡ ${slot.slots + delta}`);
-              return { ...slot, slots: slot.slots + delta };
-            }
-
-            return slot;
-          })
-        };
+  // 初始化加载 doctors（从 localStorage 或 dummy 数据）
+  useEffect(() => {
+    const stored = localStorage.getItem("doctors");
+    if (stored) {
+      setDoctors(JSON.parse(stored));
+    } else {
+      import("../data/dummyDoctors").then(module => {
+        setDoctors(module.default);
+        localStorage.setItem("doctors", JSON.stringify(module.default));
       });
+    }
+  }, []);
 
-      // localStorage
-      localStorage.setItem("doctors", JSON.stringify(updated));
-      return updated;
-    });
-  };
-  //Share the doctor data and update functions with child components across the entire application
+  // 每次变更时更新 localStorage
+  useEffect(() => {
+    localStorage.setItem("doctors", JSON.stringify(doctors));
+  }, [doctors]);
+
   return (
-    <DoctorContext.Provider value={{ doctors, setDoctors, updateDoctorSlots }}>
+    <DoctorContext.Provider value={{ doctors, setDoctors }}>
       {children}
     </DoctorContext.Provider>
   );
 };
-
-export const useDoctorContext = () => useContext(DoctorContext);

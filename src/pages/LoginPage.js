@@ -1,56 +1,69 @@
 import { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import { useNavigate, Link } from 'react-router-dom';
 import styles from '../styles/LoginPage.module.css';
 import Breadcrumb from '../components/Breadcrumb';
 import '../styles/HomePage.module.css';
 import axios from 'axios';
+import SuccessPopup from "../components/SuccessPopup";
+import ErrorPopup from '../components/ErrorPopup';
+
     export default function LoginPage() {
-      const API_BASE = process.env.REACT_APP_BACKEND_URL;
+      const API_BASE = process.env.REACT_APP_API_BASE_URL;
       const [email, setEmail] = useState('');
       const [password, setPassword] = useState('');
+      const [showSuccess, setShowSuccess] = useState(false);
+      const [showError, setShowError] = useState(false);
       const navigate = useNavigate();
+      const { setCurrentUser } = useAuth();
 
       async function handleLogin(e) {
+        
+        console.log("✅ 当前 API 地址：", process.env.REACT_APP_API_BASE_URL);
         e.preventDefault();
         console.log('📤 Sending login request to backend...');
         console.log("🔍 emailOrPhone:", email);
-console.log("🔍 password:", password);
+        console.log("🔍 password:", password);
         try {
          const response = await axios.post(`${API_BASE}/api/users/login`, {
-            email: email,  
-            password: password 
+              email,  
+              password 
           }, {
-            withCredentials: true ,
+            withCredentials: true ,  //keep logged in
             headers: {
               'Content-Type': 'application/json'
             },
-  
           });
+
           const { token, role, ...user } = response.data;
           // Save token for later requests
           localStorage.setItem('token', token);
           localStorage.setItem('role', role);
-          localStorage.setItem('user', JSON.stringify(user)); 
-          alert('Login successful!');
-
-            if (role === 'doctor') {
-            navigate('/doctor-dashboard');
-          } else {
-            navigate('/patient-dashboard');
-          }
+          setCurrentUser(response.data.user);
+           localStorage.setItem("user", JSON.stringify(response.data.user));  
+         
+            setShowSuccess(true); // login successful
+            setTimeout(() => {
+              navigate(role === 'doctor' ? '/doctor-dashboard' : '/patient-dashboard');
+            }, 2000);
           
+
         } catch (err) {
           console.error("❌ 错误状态码:", err.response?.status);
-        console.error("❌ 错误信息:", err.response?.data || err.message);
-          alert('Login failed!');
+          console.error("❌ 错误信息:", err.response?.data || err.message);
+          setShowError(true);   // login failed
+          setTimeout(() => setShowError(false), 2000);  
         }
       }
       
      
 
       return (
+        
         <div className={styles.page}>  
+        {showSuccess && <SuccessPopup />}
+        {showError && <ErrorPopup />}  
            {/* Top Navbar */}
             <div className="bg-white border-bottom">
               <div className="container d-flex justify-content-between align-items-center" style={{ height: "108px" }}>

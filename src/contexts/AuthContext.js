@@ -7,14 +7,23 @@ const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-  const API_BASE = process.env.REACT_APP_BACKEND_URL;
+  const API_BASE = process.env.REACT_APP_API_BASE_URL;
   const [currentUser, setCurrentUser, ] = useState(null);
 
     //Initialization
     useEffect(() => {
       const storedUser = localStorage.getItem("user");
-      if (storedUser) {
-        setCurrentUser(JSON.parse(storedUser));
+     try {
+      const storedUser = localStorage.getItem("user");
+        if (storedUser && storedUser !== "undefined") {
+          setCurrentUser(JSON.parse(storedUser));
+        } else {
+          localStorage.removeItem("user");
+        }
+      } catch (err) {
+        console.error("⚠️ Failed to parse localStorage user:", err);
+        localStorage.removeItem("user"); 
+        setCurrentUser(null);
       }
     }, []);
 
@@ -24,7 +33,7 @@ export const AuthProvider = ({ children }) => {
     console.log("🔍 AuthContext mounted");
     const checkSession = async () => {
       try {
-        const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users/session-check`, {
+        const res = await fetch(`${API_BASE}/api/users/session-check`, {
           credentials: "include",
         });
 
@@ -49,11 +58,12 @@ export const AuthProvider = ({ children }) => {
 
     const logout = async () => {
       try {
-        await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users/logout`, {
+        await fetch(`${API_BASE}/api/users/logout`, {
           method: "POST",
           credentials: "include",
         });
         setCurrentUser(null);
+        localStorage.removeItem("user");
       } catch (err) {
         console.error("Logout failed", err);
       }

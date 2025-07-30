@@ -6,16 +6,40 @@ import styles from '../styles/HomePage.module.css';
 import '../styles/PatientDashboard.css';
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useDoctorContext } from '../contexts/DoctorContext';
+import { useDoctors } from "../contexts/DoctorContext";
+import SuccessPopup from "../components/SuccessPopup";
 import Breadcrumb from '../components/Breadcrumb';
 
+const updateDoctorSlots = (doctorId, dateStr, delta, doctors, setDoctors) => {
+  setDoctors(prevDoctors => {
+    const updated = prevDoctors.map(doc => {
+      if (doc.id !== doctorId) return doc;
+      return {
+        ...doc,
+        availability: doc.availability.map(slot => {
+          const parsedSlotDate = new Date(`${slot.date}, ${new Date().getFullYear()}`);
+          const formattedSlotDate = parsedSlotDate.toISOString().split("T")[0];
+          if (formattedSlotDate === dateStr) {
+            return { ...slot, slots: slot.slots + delta };
+          }
+          return slot;
+        })
+      };
+    });
+
+    localStorage.setItem("doctors", JSON.stringify(updated));
+    return updated;
+  });
+};
+      
 
     export default function PatientDashboard(){
-         const API_BASE = process.env.REACT_APP_BACKEND_URL;
+         const API_BASE = process.env.REACT_APP_API_BASE_URL;
         const { currentUser } = useAuth();
+        const [showSuccess, setShowSuccess] = useState(false);
         //use dummy doctor data
-        const { doctors, updateDoctorSlots } = useDoctorContext();
-      
+        const { doctors, setDoctors } = useDoctors();
+        
         const navigate = useNavigate();
         
         //For bookAppointment
@@ -28,7 +52,7 @@ import Breadcrumb from '../components/Breadcrumb';
             "13:00", "13:30", "14:00", "15:00",
             "15:30", "16:00"
         ];
-
+        
         //handle bookAppointment
         const handleBookAppointment = (doctor, slot) => {
             if (slot.slots === 0) return;
@@ -40,50 +64,58 @@ import Breadcrumb from '../components/Breadcrumb';
         
         // For confirmBooking
         const confirmBooking = () => {
-             
-            if (!selectedDoctor || typeof selectedDoctor.id === 'undefined') {
-                alert("Error: No doctor selected.");
-                return;
-            }
-            const user = JSON.parse(localStorage.getItem("user"));
-            const [hour, minute] = selectedTime.split(':').map(Number);
-            const date = new Date();
-            date.setHours(hour);
-            date.setMinutes(minute + 30);
-            const endTime = date.toTimeString().slice(0, 5);  // "HH:MM"
+        const userJson = localStorage.getItem("user");
+        if (!selectedDoctor || !selectedDoctor.id || !userJson) {
+            alert("Missing user or doctor info");
+            return;
+        }
 
-            // selectedDate
-            const [dayOfWeek, monthStr, dayStr] = selectedDate.split(' ');
-            const currentYear = new Date().getFullYear();
-            const fullDateStr = `${monthStr} ${dayStr}, ${currentYear}`; // "Jul 24, 2025"
-            const formattedDate = new Date(fullDateStr).toISOString().split("T")[0]; // "2025-07-24"
-            
-            
-           const appointment = {
+        let user;
+        try {
+            user = JSON.parse(userJson);
+        } catch (err) {
+            alert("Invalid user info, please log in again.");
+            return;
+        }
+
+        const [hour, minute] = selectedTime.split(':').map(Number);
+        const date = new Date();
+        date.setHours(hour);
+        date.setMinutes(minute + 30);
+        const endTime = date.toTimeString().slice(0, 5);
+
+        const [dayOfWeek, monthStr, dayStr] = selectedDate.split(' ');
+        const currentYear = new Date().getFullYear();
+        const fullDateStr = `${monthStr} ${dayStr}, ${currentYear}`;
+        const formattedDate = new Date(fullDateStr).toISOString().split("T")[0];
+
+        const newAppointment = {
             doctorId: selectedDoctor.id,
-            patientId: currentUser.id,
-            appointmentDate: formattedDate,
+            doctorName: selectedDoctor.name,
+            patientId: user.user_id || user.id,
+            patientName: user.firstName || user.userName || 'Guest',
+            date: formattedDate,
             startTime: selectedTime,
             endTime: endTime,
-            status: "Confirmed",
-    
-            };
+            status: "Confirmed"
+        };
 
-             api.post(`${API_BASE}/api/appointments`, appointment, { withCredentials: true })
-                .then(() => {
-                    //update slots No.
-                     updateDoctorSlots(selectedDoctor.id, formattedDate, -1);   
-                      alert("Appointment booked!");
-                      navigate("/appointments");
-                })
-                .catch(error => {
-                    const status = error.response?.status ?? 'unknown';
-                    const data = error.response?.data ?? 'No response data';
-                    console.error('📛 Booking failed:', status, data);
-                alert(`Booking failed. Status ${status}`);
-                });
-                
-            };
+        // 模拟保存到 localStorage
+        const saved = JSON.parse(localStorage.getItem("dummyAppointments") || "[]");
+        saved.push(newAppointment);
+        localStorage.setItem("dummyAppointments", JSON.stringify(saved));
+
+        // 更新 doctor 的 slots 可用数（虚拟）
+        updateDoctorSlots(selectedDoctor.id, formattedDate, -1, doctors, setDoctors);
+        setShowTimeModal(false);
+
+        setShowSuccess(true);
+        setTimeout(() => {
+        setShowSuccess(false);
+        setShowTimeModal(false);
+        navigate("/appointments");
+        }, 2000);
+        };
         
             
         // the map expanded:
@@ -132,6 +164,7 @@ import Breadcrumb from '../components/Breadcrumb';
 
         return(
         <div>
+             {showSuccess && <SuccessPopup message="✅ Appointment booked successfully!" />}
             {/* Top Navbar */}
             <div className="bg-white border-bottom">
               <div className="container d-flex justify-content-between align-items-center" style={{ height: "108px" }}> 

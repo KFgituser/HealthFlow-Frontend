@@ -3,14 +3,39 @@ import { useNavigate, Link } from "react-router-dom";
 import styles from '../styles/HomePage.module.css';
 import '../styles/Appointments.css';
 import axios from 'axios';
-import dummyDoctors from '../data/dummyDoctors';
-import { useDoctorContext } from '../contexts/DoctorContext';
+import { useDoctors } from "../contexts/DoctorContext";
+
 import Breadcrumb from '../components/Breadcrumb';
 
-    const Appointment = () => {
-        const API_BASE = process.env.REACT_APP_BACKEND_URL;
+    // Update a doctor's available slots
+        const updateDoctorSlots = (doctorId, dateStr, delta, doctors, setDoctors) => {
+        setDoctors(prevDoctors => {
+            const updated = prevDoctors.map(doc => {
+            if (doc.id !== doctorId) return doc;
+            return {
+                ...doc,
+                availability: doc.availability.map(slot => {
+                const parsedSlotDate = new Date(`${slot.date}, ${new Date().getFullYear()}`);
+                const formattedSlotDate = parsedSlotDate.toISOString().split("T")[0];
+                if (formattedSlotDate === dateStr) {
+                    return { ...slot, slots: slot.slots + delta };
+                }
+                return slot;
+                })
+            };
+            });
+
+            localStorage.setItem("doctors", JSON.stringify(updated));
+            return updated;
+        });
+        };
+
+
+
+        const Appointment = () => {
+        const API_BASE = process.env.REACT_APP_API_BASE_URL;
         const navigate = useNavigate();
-        const { doctors, updateDoctorSlots } = useDoctorContext();
+        const { doctors, setDoctors } = useDoctors();
         //logout  
         const handleLogout = async () => {
             try {
@@ -26,19 +51,17 @@ import Breadcrumb from '../components/Breadcrumb';
         
         //Appointments
         useEffect(() => {
-            const user = JSON.parse(localStorage.getItem("user"));
-            if (!user) return;
+        const user = JSON.parse(localStorage.getItem("user"));
+        if (!user) return;
 
-            console.log("User:", user);
-            axios.get(`${API_BASE}/api/appointments/user/${user.id}`, {
-                withCredentials: true
-            })
-                .then(response => {
-            console.log("Fetched appointments:", response.data);
-                setAppointments(response.data);
-                })
-            .catch(error => console.error(error));
-            }, []);
+        const allAppointments = JSON.parse(localStorage.getItem("dummyAppointments") || "[]");
+
+        const userAppointments = allAppointments.filter(
+            appt => appt.patientId === user.user_id || appt.patientId === user.id
+        );
+
+        setAppointments(userAppointments);
+        }, []);
         //define handleReschedule and handleCancel
         //Reschedule
         const handleReschedule = async (id) => {
@@ -46,7 +69,7 @@ import Breadcrumb from '../components/Breadcrumb';
             if (!confirmed) return;
 
             try {
-                await axios.delete(`${API_BASE}/api/appointments/${id}`, { withCredentials: true });
+                await axios.delete(`/api/appointments/${id}`, { withCredentials: true });
                 
                 setAppointments(prev => prev.filter(appt => appt.appointmentId !== id));
 
@@ -58,40 +81,35 @@ import Breadcrumb from '../components/Breadcrumb';
             }
         };
 
-        //cancel appointment
-        const handleCancel = async (id) => {
-               if (!id) {
-                    alert("Invalid appointment ID");
-                    return;
-                }
-            
-            try {
-                const confirmed = window.confirm("Are you sure you want to cancel this appointment?");
-                if (!confirmed) return;
-                //Extract the doctorId and appointmentDate for restoring the slot
-                const cancelledAppointment = appointments.find(appt => appt.appointmentId === id);
-                if (!cancelledAppointment) {
-                alert("Appointment not found.");
-                return;
-                }
+        const handleCancel = (indexToRemove) => {
+            const confirmed = window.confirm("Are you sure you want to cancel this appointment?");
+            if (!confirmed) return;
 
-                const doctorId = cancelledAppointment.doctor?.id || cancelledAppointment.doctorId;
-                const appointmentDate = cancelledAppointment.appointmentDate;
-                await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/appointments/${id}`, {
-                    withCredentials: true
-                });
-                //First update the slots (+1)
-                updateDoctorSlots(doctorId, appointmentDate, +1);
-                // then update the appointment status
-                  setAppointments(prev => prev.filter(appt => appt.appointmentId !== id));
+            // 1. Get the appointment being cancelled
+            const appointmentToRemove = appointments[indexToRemove];
 
-                alert("Appointment cancelled successfully.");
-            } catch (error) {
-                console.error("Failed to cancel appointment:", error);
-                alert("Failed to cancel appointment.");
-            }
-        };
-       
+            // 2. Create a new list of appointments and update the state
+            const updatedAppointments = [...appointments];
+            updatedAppointments.splice(indexToRemove, 1);
+            setAppointments(updatedAppointments);
+            localStorage.setItem("dummyAppointments", JSON.stringify(updatedAppointments));
+
+             // 3. Parse the date to ensure consistent format
+            const formattedDate = new Date(appointmentToRemove.date).toISOString().split("T")[0];
+
+            // 4. Restore the doctor's slot count for that day
+            updateDoctorSlots(
+                appointmentToRemove.doctorId,
+                formattedDate,
+                +1,
+                doctors,
+                setDoctors
+            );
+
+            // 5. Show confirmation alert
+            alert("Appointment cancelled (virtual).");
+            };
+
         // initialize appointments and setAppointments
         const [appointments, setAppointments] = useState([]);
       
@@ -136,7 +154,7 @@ import Breadcrumb from '../components/Breadcrumb';
                     appointments.map((appt, index) => {
                     console.log("Appointment object:", appt); 
                     const doctorId = appt.doctor?.id || appt.doctorId;
-                    const doctor = dummyDoctors.find(doc => doc.id === doctorId);
+                    const doctor = doctors.find(doc => doc.id === doctorId);
                     
                     return (
                      <div
@@ -161,12 +179,12 @@ import Breadcrumb from '../components/Breadcrumb';
                                 "Doctor Info Not Available"
                             )}
                             </h3>
-                            <p>Date: {appt.appointmentDate}</p>
+                            <p>Date: {appt.date}</p> 
                             <p>Time: {appt.startTime} - {appt.endTime}</p>
                             <p>Status: {appt.status}</p>
                             <div className="appointment-actions">
                             <button onClick={() => handleReschedule(appt.appointmentId)}>Reschedule</button>
-                            <button onClick={() => handleCancel(appt.appointmentId)}>Cancel</button>
+                            <button onClick={() => handleCancel(index)}>Cancel</button>
                             </div>
                         </div>
 

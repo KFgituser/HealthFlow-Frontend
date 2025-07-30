@@ -7,7 +7,7 @@ import '../styles/LoginPage.module.css';
 import axios from 'axios';
 
   export default function RegisterPage() {   
-    const API_BASE = process.env.REACT_APP_BACKEND_URL;
+    const API_BASE = process.env.REACT_APP_API_BASE_URL;
     const navigate = useNavigate();
       const [formData, setFormData] = useState({
           firstName: '',

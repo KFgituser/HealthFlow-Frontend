@@ -6,7 +6,7 @@ import Breadcrumb from '../components/Breadcrumb';
 import axios from 'axios';
 
         export default function ResetPasswordPage() {
-        const API_BASE = process.env.REACT_APP_BACKEND_URL;
+        const API_BASE = process.env.REACT_APP_API_BASE_URL;
           const navigate = useNavigate();
         const [formData, setFormData] = useState({
             emailOrPhone: '',

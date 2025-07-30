@@ -2,13 +2,15 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import styles from '../styles/HomePage.module.css';
 import { useAuth } from '../contexts/AuthContext';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import symptomToSpecialtyMap from '../data/symptomToSpecialtyMap';
 import Breadcrumb from '../components/Breadcrumb';
+import StatsSection from "../components/StatsSection";
 
 
 export default function HomePage() {
-     const { currentUser, logout } = useAuth();
+    
+    const { currentUser, logout } = useAuth();
     //filters and navigation
     const [specialty, setSpecialty] = useState('');
     const [location, setLocation] = useState('');
@@ -35,6 +37,8 @@ export default function HomePage() {
         navigate(`/dashboard?${query.toString()}`);
         };
 
+
+      
     
 
     return (
@@ -48,7 +52,7 @@ export default function HomePage() {
                     alt="HealthFlow Logo"
                     style={{ height: "30px", marginRight: "10px", verticalAlign: "middle" }}
                   />
-                  <h4 className="mb-0 text-dark">HealthFlow</h4>
+                  <h5 style={{ fontSize: "35px", color: "#333" }}>HealthFlow</h5>
                 </Link>
                <div className="d-flex align-items-center gap-3">
                 {currentUser && (
@@ -75,7 +79,7 @@ export default function HomePage() {
             <div className="container mt-5">
             <h2 className="mb-3">Find your doctor</h2>
             {/* Search Section */}
-                <div className="container my-5">
+                <div className="container my-5" >
                     <div className="row mb-3">
                        <div className="col-md-5" >
                             <input
@@ -119,12 +123,58 @@ export default function HomePage() {
                     </div>
                 </div>
             </div>
+             
+             <StatsSection />                   
             
-            {/* Promotional Section */}
-            <div className="bg-light text-center py-5">
-                <h5 className="fw-bold">News, Activities and Website Promotion</h5>
-                <p>Stay tuned for the latest updates and health tips.</p>
-            </div>
+                 {/* image Section1 */}
+                <div className="bg-light py-5 ">
+                    <div className="container d-flex align-items-center">
+                        {/* left side */}
+                        <div className="text-start me-4" style={{ flex: 1 }}>
+                        <h2 className="mb-3">HealthFlow Medical Service Platform</h2>
+                        <p>We are committed to providing every patient with fast, reliable, and convenient medical care.</p>
+                        </div>
+
+                        {/* right side*/}
+                        <img
+                        src="/images/promotion.png"
+                        alt="Promotional"
+                        style={{
+                            width: '800px',
+                            maxHeight: '450px',
+                            height: '100%',
+                            objectFit: 'cover',
+                            flexShrink: 0
+                        }}
+                        />
+                    </div>
+                </div>
+
+             {/* image Section2 */}
+                <div className="bg-light py-5 ">
+                    <div className="container d-flex flex-wrap align-items-center gap-4">
+                        {/* left side */}
+                         <img
+                        src="/images/medicalConsultation.png"
+                        alt="Promotional"
+                        style={{
+                            width: '800px',
+                            maxHeight: '450px',
+                            height: '100%',
+                            objectFit: 'cover',
+                            flexShrink: 0
+                        }}
+                        />
+                       
+                        {/* right side*/}
+                        <div className="text-start me-4" style={{ flex: 1, minWidth: "300px" }}>
+                        <h2 className="mb-3">Your Trusted Healthcare Partner</h2>
+                        <p>  HealthFlow helps you connect with the right doctor quickly and easily. 
+        From general practitioners to specialists, we streamline your medical journey.</p>
+                        </div>
+
+                    </div>
+                </div>
                 
                 
             {/* Footer section */}
