@@ -45,7 +45,7 @@ const formattedSlotDate = `${year}-${month}-${day}`;
       
 
     export default function PatientDashboard(){
-         const API_BASE = process.env.REACT_APP_API_BASE_URL;
+        const API_BASE = process.env.REACT_APP_API_BASE_URL;
         const { currentUser } = useAuth();
         const [showSuccess, setShowSuccess] = useState(false);
         //google map
@@ -152,7 +152,7 @@ const formattedDate = `${currentYear}-${String(monthIndex).padStart(2, '0')}-${S
         //logout  
         const handleLogout = async () => {
             try {
-            await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users/logout`, {
+            await fetch(`${API_BASE}/api/users/logout`, {
                 method: "POST",
                 credentials: "include", // Important for session cookies
             });
