@@ -17,7 +17,7 @@ import { useAuth } from '../contexts/AuthContext';
    //handle logout
    const handleLogout = async () => {
             try {
-            await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users/logout`, {
+            await fetch(`${API_BASE}/api/users/logout`, {
                 method: "POST",
                 credentials: "include", // Important for session cookies
             });

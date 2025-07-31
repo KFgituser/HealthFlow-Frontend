@@ -88,7 +88,7 @@ console.log("Doctor availability dates:", doctor.availability.map(a => a.date));
 
      const handleLogout = async () => {
             try {
-            await fetch(`${API_BASE}/api/users/logout`, {
+            await fetch(`${API_BASE}/api/users/logout`,{
                 method: "POST",
                 credentials: "include", // Important for session cookies
             });

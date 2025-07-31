@@ -19,7 +19,7 @@ import ErrorPopup from '../components/ErrorPopup';
 
       async function handleLogin(e) {
         
-        console.log("✅ 当前 API 地址：", process.env.REACT_APP_API_BASE_URL);
+       
         e.preventDefault();
         console.log('📤 Sending login request to backend...');
         console.log("🔍 emailOrPhone:", email);
