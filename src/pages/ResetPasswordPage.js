@@ -26,13 +26,20 @@ import axios from 'axios';
             alert('Passwords do not match!');
             return;
           }
+          
+ const data = {
+    emailOrPhone: formData.emailOrPhone,
+    verificationCode: formData.verificationCode,
+    newPassword: formData.newPassword
+  };
 
-          try {
-            await axios.post(`${API_BASE}/api/users/reset-password`, {
-              emailOrPhone: formData.emailOrPhone,
-              verificationCode: formData.verificationCode,
-              newPassword: formData.newPassword
-            });
+  try {
+    await axios.post(`${API_BASE}/api/users/reset-password`, data, {
+      withCredentials: true, // 如果后端用 cookie 认证就加上，否则可以省略
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
 
             alert('Password reset successfully!');
             navigate('/login');

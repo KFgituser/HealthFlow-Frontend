@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }) => {
     console.log("🔍 AuthContext mounted");
     const checkSession = async () => {
       try {
-        const res = await fetch(`${API_BASE}/api/users/session-check`, {
+        const res = await fetch(`${API_BASE}/api/users/session-check`,{
           credentials: "include",
         });
 

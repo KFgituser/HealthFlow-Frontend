@@ -24,12 +24,13 @@ import ErrorPopup from '../components/ErrorPopup';
         console.log('📤 Sending login request to backend...');
         console.log("🔍 emailOrPhone:", email);
         console.log("🔍 password:", password);
-        try {
-         const response = await axios.post(`${API_BASE}/api/users/login`, {
-              email,  
-              password 
-          }, {
-            withCredentials: true ,  //keep logged in
+          const payload = {
+            email,
+            password
+          };
+          try {
+          const response = await axios.post(`${API_BASE}/api/users/login`, payload, {
+            withCredentials: true,
             headers: {
               'Content-Type': 'application/json'
             },
