@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import { FaUserFriends, FaUserMd, FaClock } from "react-icons/fa";
 
 const StatCard = ({ icon, label, value, color }) => (
   <div
-    className="d-flex align-items-center rounded p-4"
+    className="d-flex align-items-center justify-content-center rounded p-4"
     style={{
       backgroundColor: color.bg,
       color: "#000", 

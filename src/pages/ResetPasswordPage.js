@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
 import styles from '../styles/ResetPasswordPage.module.css';
@@ -7,7 +7,7 @@ import axios from 'axios';
 
         export default function ResetPasswordPage() {
         const API_BASE = process.env.REACT_APP_API_BASE_URL;
-          const navigate = useNavigate();
+        const navigate = useNavigate();
         const [formData, setFormData] = useState({
             emailOrPhone: '',
             verificationCode: '',

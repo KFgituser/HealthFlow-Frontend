@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import { useNavigate, Link } from "react-router-dom";
 import styles from '../styles/HomePage.module.css';
 import '../styles/Appointments.css';
@@ -98,14 +98,40 @@ import Breadcrumb from '../components/Breadcrumb';
             const formattedDate = new Date(appointmentToRemove.date).toISOString().split("T")[0];
 
             // 4. Restore the doctor's slot count for that day
-            updateDoctorSlots(
-                appointmentToRemove.doctorId,
-                formattedDate,
-                +1,
-                doctors,
-                setDoctors
-            );
+          updateDoctorSlots(
+    appointmentToRemove.doctorId,
+    formattedDate,
+    +1,
+    doctors,
+    setDoctors
+  );
 
+  // ✅ 恢复 doctor 的 availability.time 段
+  setDoctors(prevDoctors => {
+    const updatedDoctors = prevDoctors.map(doc => {
+      if (doc.id !== appointmentToRemove.doctorId) return doc;
+
+      return {
+        ...doc,
+        availability: doc.availability.map(slot => {
+          const slotDate = new Date(`${slot.date}, ${new Date().getFullYear()}`).toISOString().split("T")[0];
+          if (slotDate !== formattedDate) return slot;
+
+          const updatedTimes = slot.times.map(t => {
+            if (t.time === appointmentToRemove.startTime) {
+              return { ...t, available: true };
+            }
+            return t;
+          });
+
+          return { ...slot, times: updatedTimes };
+        })
+      };
+    });
+
+    localStorage.setItem("doctors", JSON.stringify(updatedDoctors));
+    return updatedDoctors;
+  });
             // 5. Show confirmation alert
             alert("Appointment cancelled (virtual).");
             };
@@ -137,7 +163,8 @@ import Breadcrumb from '../components/Breadcrumb';
                 </div>
               </div>
             </div>
-              {/* Breadcrumb */}
+            
+            {/* Breadcrumb */}
             <Breadcrumb
             items={[
                 { label: "Home", link: "/" },
@@ -153,8 +180,8 @@ import Breadcrumb from '../components/Breadcrumb';
                 ) : (
                     appointments.map((appt, index) => {
                     console.log("Appointment object:", appt); 
-                    const doctorId = appt.doctor?.id || appt.doctorId;
-                    const doctor = doctors.find(doc => doc.id === doctorId);
+               const doctorId = Number(appt.doctor?.id || appt.doctorId);
+              const doctor = doctors.find(doc => doc.id === doctorId);
                     
                     return (
                      <div
@@ -179,7 +206,7 @@ import Breadcrumb from '../components/Breadcrumb';
                                 "Doctor Info Not Available"
                             )}
                             </h3>
-                            <p>Date: {appt.date}</p> 
+                            <p>Date: {appt.appointmentDate}</p>
                             <p>Time: {appt.startTime} - {appt.endTime}</p>
                             <p>Status: {appt.status}</p>
                             <div className="appointment-actions">

@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import api from '../services/api';
+
 import { useNavigate, Link } from 'react-router-dom';
 import styles from '../styles/LoginPage.module.css';
-import Breadcrumb from '../components/Breadcrumb';
 import '../styles/HomePage.module.css';
 import axios from 'axios';
 import SuccessPopup from "../components/SuccessPopup";
@@ -40,13 +39,24 @@ import ErrorPopup from '../components/ErrorPopup';
           // Save token for later requests
           localStorage.setItem('token', token);
           localStorage.setItem('role', role);
-          setCurrentUser(response.data.user);
-           localStorage.setItem("user", JSON.stringify(response.data.user));  
-         
+          setCurrentUser(response.data);
+          localStorage.setItem("user", JSON.stringify(response.data));  
+
+          //设置 Axios 默认的 Authorization
+          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+          if (role === 'doctor' && response.data.id) {
+            localStorage.setItem("doctorId", response.data.id);
+          }
             setShowSuccess(true); // login successful
-            setTimeout(() => {
+           setTimeout(() => {
+            const userReady = localStorage.getItem("user");
+            if (userReady) {
               navigate(role === 'doctor' ? '/doctor-dashboard' : '/patient-dashboard');
-            }, 2000);
+            } else {
+              console.warn("⚠️ User not saved in localStorage yet.");
+            }
+          }, 2000);
           
 
         } catch (err) {

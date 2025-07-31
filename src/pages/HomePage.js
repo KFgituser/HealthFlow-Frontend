@@ -2,9 +2,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import styles from '../styles/HomePage.module.css';
 import { useAuth } from '../contexts/AuthContext';
-import { useEffect, useState } from 'react';
+import {  useState } from 'react';
 import symptomToSpecialtyMap from '../data/symptomToSpecialtyMap';
-import Breadcrumb from '../components/Breadcrumb';
+
 import StatsSection from "../components/StatsSection";
 
 
@@ -56,12 +56,17 @@ export default function HomePage() {
                 </Link>
                <div className="d-flex align-items-center gap-3">
                 {currentUser && (
+                    currentUser.role === "doctor" ? (
+                    <Link to="/doctor-dashboard" className="btn btn-outline-primary me-2">My dashboard</Link>
+                    ) : (
                     <Link to="/appointments" className="btn btn-outline-primary me-2">My Apts</Link>
+                    )
                 )}
+
                 <Link to="/help" className="btn btn-outline-secondary me-2">Help</Link>
                 {currentUser ? (
                     <>
-                    <span className="me-2">Hi, {currentUser.firstName}!</span>
+                    Hi, {currentUser.role === "doctor" ? "doctor" : currentUser.firstName}!
                     <button className="btn btn-outline-danger" onClick={logout}>Log Out</button>
                     </>
                 ) : (

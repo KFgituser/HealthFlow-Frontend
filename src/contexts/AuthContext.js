@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import  { createContext, useContext, useEffect, useState } from 'react';
 
 
 //Session-Aware UI
@@ -11,21 +11,24 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser, ] = useState(null);
 
     //Initialization
-    useEffect(() => {
-      
-     try {
-      const storedUser = localStorage.getItem("user");
-        if (storedUser && storedUser !== "undefined") {
-          setCurrentUser(JSON.parse(storedUser));
-        } else {
-          localStorage.removeItem("user");
-        }
-      } catch (err) {
-        console.error("⚠️ Failed to parse localStorage user:", err);
-        localStorage.removeItem("user"); 
-        setCurrentUser(null);
-      }
-    }, [API_BASE]);
+ useEffect(() => {
+  try {
+    const storedUser = localStorage.getItem("user");
+
+    if (storedUser && storedUser !== "undefined" && storedUser.trim().startsWith("{")) {
+      const parsedUser = JSON.parse(storedUser);
+      setCurrentUser(parsedUser);
+      localStorage.setItem("user", JSON.stringify(parsedUser));
+    } else {
+      localStorage.removeItem("user");
+      setCurrentUser(null);
+    }
+  } catch (err) {
+    console.error("⚠️ Failed to parse localStorage user:", err);
+    localStorage.removeItem("user");
+    setCurrentUser(null);
+  }
+}, []);
 
     
     // Check session on mount

@@ -1,16 +1,16 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect } from 'react';
 
-// 创建上下文
+// Create a context
 const DoctorContext = createContext();
 
-// Hook 简化使用
+// Use a custom hook for simpler usage
 export const useDoctors = () => useContext(DoctorContext);
 
-// Provider 包裹全局
+//  Wrap the global app with a Provider
 export const DoctorProvider = ({ children }) => {
   const [doctors, setDoctors] = useState([]);
 
-  // 初始化加载 doctors（从 localStorage 或 dummy 数据）
+  // initialization doctors from localStorage or dummy data
   useEffect(() => {
     const stored = localStorage.getItem("doctors");
     if (stored) {
@@ -23,7 +23,7 @@ export const DoctorProvider = ({ children }) => {
     }
   }, []);
 
-  // 每次变更时更新 localStorage
+  // Update localStorage on every change
   useEffect(() => {
     localStorage.setItem("doctors", JSON.stringify(doctors));
   }, [doctors]);
