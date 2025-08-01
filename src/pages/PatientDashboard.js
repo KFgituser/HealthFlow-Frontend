@@ -25,11 +25,11 @@ const updateDoctorSlots = (doctorId, dateStr, delta, doctors, setDoctors) => {
       return {
         ...doc,
         availability: doc.availability.map(slot => {
-          const parsedSlotDate = new Date(`${slot.date}, ${new Date().getFullYear()}`);
-const year = parsedSlotDate.getFullYear();
-const month = String(parsedSlotDate.getMonth() + 1).padStart(2, '0');
-const day = String(parsedSlotDate.getDate()).padStart(2, '0');
-const formattedSlotDate = `${year}-${month}-${day}`;
+            const parsedSlotDate = new Date(`${slot.date}, ${new Date().getFullYear()}`);
+            const year = parsedSlotDate.getFullYear();
+            const month = String(parsedSlotDate.getMonth() + 1).padStart(2, '0');
+            const day = String(parsedSlotDate.getDate()).padStart(2, '0');
+            const formattedSlotDate = `${year}-${month}-${day}`;
           if (formattedSlotDate === dateStr) {
             return { ...slot, slots: slot.slots + delta };
           }
@@ -99,11 +99,10 @@ const formattedSlotDate = `${year}-${month}-${day}`;
         date.setMinutes(minute + 30);
         const endTime = date.toTimeString().slice(0, 5);
 
-     const [dayOfWeek, monthStr, dayStr] = selectedDate.split(" ");
-const currentYear = new Date().getFullYear();
-
-const monthIndex = new Date(`${monthStr} 1, ${currentYear}`).getMonth() + 1;
-const formattedDate = `${currentYear}-${String(monthIndex).padStart(2, '0')}-${String(dayStr).padStart(2, '0')}`;
+        const [dayOfWeek, monthStr, dayStr] = selectedDate.split(" ");
+        const currentYear = new Date().getFullYear();
+        const monthIndex = new Date(`${monthStr} 1, ${currentYear}`).getMonth() + 1;
+        const formattedDate = `${currentYear}-${String(monthIndex).padStart(2, '0')}-${String(dayStr).padStart(2, '0')}`;
 
         const newAppointment = {
             doctorId: selectedDoctor.id,
@@ -228,7 +227,7 @@ const formattedDate = `${currentYear}-${String(monthIndex).padStart(2, '0')}-${S
 
         return(
         <div>
-             {showSuccess && <SuccessPopup message="Appointment booked successfully!" />}
+            {showSuccess && <SuccessPopup message="Appointment booked successfully!" />}
             {/* Top Navbar */}
             <div className="bg-white border-bottom">
               <div className="container d-flex justify-content-between align-items-center" style={{ height: "108px" }}> 
@@ -241,10 +240,21 @@ const formattedDate = `${currentYear}-${String(monthIndex).padStart(2, '0')}-${S
                   <h3 className="mb-0 text-dark">HealthFlow</h3>
                 </Link>
                 <div className="d-flex align-items-center gap-3">
-                    <Link to="/appointments" className="btn btn-outline-primary me-2">My Apts</Link>
-                    <Link to="/help" className="btn btn-outline-secondary me-2">Help</Link>
-                    <a href="#" className="btn btn-outline-danger" onClick={handleLogout}>Log Out</a> 
+                    {currentUser ? (
+                    <>
+                        <Link to="/appointments" className="btn btn-outline-primary me-2">My Apts</Link>
+                        <Link to="/help" className="btn btn-outline-secondary me-2">Help</Link>
+                        <button className="btn btn-outline-danger" onClick={handleLogout}>Log Out</button>
+                    </>
+                    ) : (
+                    <>
+                        <Link to="/help" className="btn btn-outline-secondary me-2">Help</Link>
+                        <Link to="/login" className="btn btn-outline-primary me-2">Log in</Link>
+                        <Link to="/register" className="btn btn-outline-success">Sign Up</Link>
+                    </>
+                    )}
                 </div>
+
               </div>
             </div>
                 {/* Breadcrumb */}
@@ -315,8 +325,6 @@ const formattedDate = `${currentYear}-${String(monthIndex).padStart(2, '0')}-${S
                         </div>
                 </div>
                 <div className="main-dashboard d-flex">
-                    
-    
                     {/* Doctor List */}
                     <div className="doctor-list flex-grow-1 p-3">
                         {doctors
@@ -378,8 +386,6 @@ const formattedDate = `${currentYear}-${String(monthIndex).padStart(2, '0')}-${S
                         </div>
                         ))}
                     </div>
-
-                
 
                     {/* Map Section */}
                     <div

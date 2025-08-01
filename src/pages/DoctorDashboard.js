@@ -129,6 +129,7 @@ console.log("Doctor availability dates:", doctor.availability.map(a => a.date));
       const handleAddSlotClick = () => {
         setView('/doctor/availability'); // change this path to your actual route
       };
+      
       //Dashboard Overview
       const DashboardOverview = () => (
         <div className="dashboard-overview">

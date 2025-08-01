@@ -11,24 +11,24 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser, ] = useState(null);
 
     //Initialization
- useEffect(() => {
-  try {
-    const storedUser = localStorage.getItem("user");
+    useEffect(() => {
+      try {
+        const storedUser = localStorage.getItem("user");
 
-    if (storedUser && storedUser !== "undefined" && storedUser.trim().startsWith("{")) {
-      const parsedUser = JSON.parse(storedUser);
-      setCurrentUser(parsedUser);
-      localStorage.setItem("user", JSON.stringify(parsedUser));
-    } else {
-      localStorage.removeItem("user");
-      setCurrentUser(null);
-    }
-  } catch (err) {
-    console.error("⚠️ Failed to parse localStorage user:", err);
-    localStorage.removeItem("user");
-    setCurrentUser(null);
-  }
-}, []);
+        if (storedUser && storedUser !== "undefined" && storedUser.trim().startsWith("{")) {
+          const parsedUser = JSON.parse(storedUser);
+          setCurrentUser(parsedUser);
+          localStorage.setItem("user", JSON.stringify(parsedUser));
+        } else {
+          localStorage.removeItem("user");
+          setCurrentUser(null);
+        }
+      } catch (err) {
+        console.error("⚠️ Failed to parse localStorage user:", err);
+        localStorage.removeItem("user");
+        setCurrentUser(null);
+      }
+    }, []);
 
     
     // Check session on mount
@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     checkSession();
-  }, [API_BASE]);
+    }, [API_BASE]);
 
     const logout = async () => {
       try {
