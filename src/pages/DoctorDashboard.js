@@ -256,7 +256,7 @@ export default function DoctorDashboard(){
             <div className="appointments-box">
             {appointments.length > 0 ? (
               appointments.map((appt, idx) => (
-                <div key={idx} className="appointment-card p-3 rounded mb-3 d-flex justify-content-between align-items-center" style={{ backgroundColor: "#f4f4f4" }}>
+                <div key={idx} className="appointment-card p-3 rounded mb-3 d-flex align-items-center" style={{ backgroundColor: "#f4f4f4" }}>
                   <div>
                     <h5>{appt.patientName}</h5>
                     <p>Date: {appt.date}</p>
