@@ -43,7 +43,7 @@ import ErrorPopup from '../components/ErrorPopup';
           setCurrentUser(response.data);
           localStorage.setItem("user", JSON.stringify(response.data));  
 
-          //设置 Axios 默认的 Authorization
+          //Set the default Authorization header for all Axios requests.
           axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
           if (role === 'doctor' && response.data.id) {

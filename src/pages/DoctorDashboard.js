@@ -44,38 +44,31 @@ export default function DoctorDashboard(){
       return;
     }
 
-    // 转换成 dummy 数据的日期格式：Mon, Jul 22
-    const formattedDate = new Date(specificDate).toLocaleDateString("en-US", {
-      weekday: "short",
-      month: "short",
-      day: "numeric"
-    });
-          console.log("specificDate raw:", specificDate);
-console.log("formattedDate:", formattedDate);
-console.log("Doctor availability dates:", doctor.availability.map(a => a.date));
+    // Mon, Jul 22
+    const allAppointments = JSON.parse(localStorage.getItem("dummyAppointments") || "[]");
 
-    const matched = doctor.availability.find(a => a.date === formattedDate);
-    if (!matched) {
-      setAppointments([]);
-      return;
-    }
-    const availableTimes = matched.times.filter(t => t.available);
-    if (availableTimes.length === 0) {
-      setAppointments([]);
-      return;
-    }
-    // 取出可用时段
-     const availableAppointments = matched.times
-      .filter(t => t.available)
-      .map(t => ({
-        startTime: t.time,
-        endTime: addHalfHour(t.time),
-        date: matched.date,
-        status: "Available",
-        patientName: "N/A",
-        patientAvatar: null,
-    }));
-      setAppointments(availableAppointments);
+const selectedDate = new Date(specificDate).toISOString().split("T")[0]; // 2025-07-24 
+
+const doctorAppointments = allAppointments.filter(
+  appt => (appt.doctorId === doctorId || appt.doctor?.id === doctorId) && appt.date === selectedDate
+);
+
+// 把没有预约的情况也处理掉
+if (doctorAppointments.length === 0) {
+  setAppointments([]);
+} else {
+  setAppointments(
+    doctorAppointments.map(appt => ({
+      startTime: appt.startTime,
+      endTime: appt.endTime,
+      date: appt.date,
+      status: appt.status,
+      patientName: appt.patientName || "N/A",
+      patientAvatar: appt.patientAvatar || null,
+    }))
+  );
+}
+
 
     };
       function addHalfHour(timeStr) {
