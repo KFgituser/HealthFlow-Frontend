@@ -209,7 +209,7 @@ input[type="date"] {
 .form-buttons {
   display: flex;
   justify-content: center;
-  gap: 30px;
+  gap: 50px;
 }
 
 .form-buttons button {
@@ -247,6 +247,7 @@ input[type="date"] {
   border: 1px solid #ccc;
   border-radius: 16px;
   padding: 30px 20px;
+  gap: 30px; 
   width: 500px;                 
   height: 580px;                
   text-align: center;
