@@ -47,27 +47,27 @@ export default function DoctorDashboard(){
     // Mon, Jul 22
     const allAppointments = JSON.parse(localStorage.getItem("dummyAppointments") || "[]");
 
-const selectedDate = new Date(specificDate).toISOString().split("T")[0]; // 2025-07-24 
+    const selectedDate = new Date(specificDate).toISOString().split("T")[0]; // 2025-07-24 
 
-const doctorAppointments = allAppointments.filter(
-  appt => (appt.doctorId === doctorId || appt.doctor?.id === doctorId) && appt.date === selectedDate
-);
+    const doctorAppointments = allAppointments.filter(
+      appt => (appt.doctorId === doctorId || appt.doctor?.id === doctorId) && appt.date === selectedDate
+    );
 
-// 把没有预约的情况也处理掉
-if (doctorAppointments.length === 0) {
-  setAppointments([]);
-} else {
-  setAppointments(
-    doctorAppointments.map(appt => ({
-      startTime: appt.startTime,
-      endTime: appt.endTime,
-      date: appt.date,
-      status: appt.status,
-      patientName: appt.patientName || "N/A",
-      patientAvatar: appt.patientAvatar || null,
-    }))
-  );
-}
+    // 
+    if (doctorAppointments.length === 0) {
+      setAppointments([]);
+    } else {
+      setAppointments(
+        doctorAppointments.map(appt => ({
+          startTime: appt.startTime,
+          endTime: appt.endTime,
+          date: appt.date,
+          status: appt.status,
+          patientName: appt.patientName || "N/A",
+          patientAvatar: appt.patientAvatar || null,
+        }))
+      );
+    }
 
 
     };
@@ -264,7 +264,7 @@ if (doctorAppointments.length === 0) {
                     <p>Status: {appt.status}</p>
                   </div>
                   <div>
-                    <img src={appt.patientAvatar || "/images/default-avatar.png"} alt="Patient" style={{ width: "80px", borderRadius: "50%" }} />
+                    <img src={appt.patientAvatar || "/images/patient-avatar-eric.png"} alt="Patient" style={{ width: "80px", borderRadius: "50%" }} />
                   </div>
                 </div>
               ))
