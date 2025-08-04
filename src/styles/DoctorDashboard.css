@@ -107,7 +107,7 @@ input[type="date"] {
 .appointment-card {
   background-color: #f4f4f4;
   display: flex;
-  padding: 20px;
+  padding: 40px;
   border-radius: 12px;
 }
 
