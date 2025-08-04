@@ -76,7 +76,7 @@ input[type="date"] {
 .form-buttons {
   margin-top: 20px;
   display: flex;
-  gap: 10px;
+  gap: 50px;
 }
 
 .form-buttons button {
@@ -102,6 +102,15 @@ input[type="date"] {
   overflow-y: auto;
   margin: 16px 0;
   line-height: 1.6;
+}
+
+.appointment-card {
+  background-color: #f4f4f4;
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  padding: 20px;
+  border-radius: 12px;
 }
 
 .schedule-view input[type="date"] {
