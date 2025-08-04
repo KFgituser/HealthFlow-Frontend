@@ -76,10 +76,12 @@ input[type="date"] {
 .form-buttons {
   margin-top: 20px;
   display: flex;
-  gap: 60px;
+  gap: 50px;
 }
 
 .form-buttons button {
+  display: flex !important;
+  justify-content: center;
   padding: 8px 20px;
   border-radius: 6px;
   border: none;
@@ -105,9 +107,6 @@ input[type="date"] {
 .appointment-card {
   background-color: #f4f4f4;
   display: flex;
-  align-items: center;
-  justify-content: space-between; 
-  gap: 30px;
   padding: 20px;
   border-radius: 12px;
 }
