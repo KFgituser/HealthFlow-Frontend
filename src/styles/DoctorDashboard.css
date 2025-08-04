@@ -76,7 +76,7 @@ input[type="date"] {
 .form-buttons {
   margin-top: 20px;
   display: flex;
-  gap: 50px;
+  gap: 60px;
 }
 
 .form-buttons button {
@@ -98,8 +98,6 @@ input[type="date"] {
   padding: 10px 20px;
   border-radius: 10px;
   border: 1px solid #ddd;
-  max-height: 200px;
-  overflow-y: auto;
   margin: 16px 0;
   line-height: 1.6;
 }
