@@ -92,7 +92,7 @@ export default function DoctorDashboard(){
             console.error("Logout failed:", error);
             }
     };
-    
+    //add a slot
     const handleSave = () => {
   const doctorId = parseInt(localStorage.getItem("doctorId"));
   if (!doctorId || !specificDate || !startTime) {
@@ -157,22 +157,66 @@ const dateObj = new Date(specificDate);
   setStartTime('');
   setEndTime('');
   setSpecificDate('');
-};
+    };
+    //delete a slot
+    const handleDelete = () => {
+  const doctorId = parseInt(localStorage.getItem("doctorId"));
+  if (!doctorId || !specificDate || !startTime) {
+    alert("Missing information to delete availability");
+    return;
+  }
 
-      const handleCancel = () => {
+  const dateObj = new Date(specificDate);
+  const formattedDate = dateObj.toLocaleDateString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric'
+  });
+
+  setDoctors(prevDoctors => {
+    const updatedDoctors = prevDoctors.map(doc => {
+      if (doc.id !== doctorId) return doc;
+
+      const availability = [...doc.availability];
+      const daySlot = availability.find(slot => slot.date === formattedDate.trim());
+      if (!daySlot) return doc;
+
+      const originalLength = daySlot.times.length;
+      daySlot.times = daySlot.times.filter(slot => slot.time !== startTime);
+      if (daySlot.times.length < originalLength) {
+        daySlot.slots = Math.max(0, daySlot.slots - 1);
+      }
+
+      return { ...doc, availability };
+    });
+
+    localStorage.setItem("doctors", JSON.stringify(updatedDoctors));
+    return updatedDoctors;
+  });
+
+  alert("Slot deleted successfully.");
+  setSelectedDay('');
+  setRepeat('none');
+  setStartTime('');
+  setEndTime('');
+  setSpecificDate('');
+    };
+
+    const handleCancel = () => {
         setSelectedDay('');
+        setSelectedDays([]); 
         setRepeat('none');
         setStartTime('');
         setEndTime('');
         setSpecificDate('');
-      };
+    };
 
-      const handleDateChange = (e) => {
+    const handleDateChange = (e) => {
         const date = new Date(e.target.value);
         // You could fetch appointments for this date from backend
         console.log('Date changed:', date);
         setSpecificDate(date);
-      };
+    };
 
     
       const openAddSlotForm = () => {
@@ -285,6 +329,7 @@ const dateObj = new Date(specificDate);
 
           <div className="form-buttons">
             <button onClick={handleSave}>Save</button>
+            <button onClick={handleDelete}>Delete</button>
             <button onClick={handleCancel}>Cancel</button>
             <button onClick={() => setView('viewSchedule')}>back to MySchedule</button>
           </div>
