@@ -113,6 +113,7 @@ export default function DoctorDashboard(){
         setSpecificDate(date);
       };
 
+    
       const openAddSlotForm = () => {
         // If you're toggling views/forms, you can change a state here
         console.log('Opening add slot form...');
@@ -213,7 +214,7 @@ export default function DoctorDashboard(){
           <div className="form-buttons">
             <button onClick={handleSave}>Save</button>
             <button onClick={handleCancel}>Cancel</button>
-            <button onClick={handleCancel}>back to board</button>
+            <button onClick={() => setView('viewSchedule')}>back to MySchedule</button>
           </div>
         </div>
       );
@@ -256,7 +257,7 @@ export default function DoctorDashboard(){
             <div className="appointments-box">
             {appointments.length > 0 ? (
               appointments.map((appt, idx) => (
-                <div key={idx} className="appointment-card mb-3 d-flex align-items-center justify-content-center gap-5">
+                <div key={idx} className="appointment-card mb-3 d-flex align-items-center justify-content-center gap-6">
                   <div>
                     <h5>{appt.patientName}</h5>
                     <p>Date: {appt.date}</p>

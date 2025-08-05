@@ -55,7 +55,6 @@ function App() {
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/appointments" element={<Appointment />} />
           <Route path="/dashboard" element={<PatientDashboard />} />
-
           {/* add more routes here */}
         </Routes>
      
