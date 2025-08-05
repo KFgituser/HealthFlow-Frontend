@@ -217,7 +217,7 @@ import Breadcrumb from '../components/Breadcrumb';
                             src={doctor.imageUrl || '/images/default-doctor.png'}
                             alt={doctor.name}
                             className="rounded-circle"
-                            style={{ width: '270px', height: '27px', objectFit: 'cover' }}
+                            style={{ width: '270px', height: '270px', objectFit: 'cover' }}
                             />
                             </div>
                         )}
