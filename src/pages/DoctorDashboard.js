@@ -113,7 +113,7 @@ const dateObj = new Date(specificDate);
       if (doc.id !== doctorId) return doc;
 
       const availability = [...doc.availability];
-      let daySlot = availability.find(slot => slot.date === formattedDate);
+      let daySlot = availability.find(slot => slot.date === formattedDate.trim());
 
       if (!daySlot) {
         // 新建日期 slot

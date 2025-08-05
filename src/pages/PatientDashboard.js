@@ -29,7 +29,7 @@ const updateDoctorSlots = (doctorId, dateStr, delta, doctors, setDoctors) => {
             const year = parsedSlotDate.getFullYear();
             const month = String(parsedSlotDate.getMonth() + 1).padStart(2, '0');
             const day = String(parsedSlotDate.getDate()).padStart(2, '0');
-            const formattedSlotDate = `${year}-${month}-${day}`;
+            const formattedSlotDate = `${year}-${month}-${day}`.trim();
           if (formattedSlotDate === dateStr) {
             return { ...slot, slots: slot.slots + delta };
           }
