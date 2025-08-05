@@ -130,19 +130,19 @@ const dateObj = new Date(specificDate);
 
       // 更新时间段
       let slotToUpdate = daySlot.times.find(slot => slot.time === timeToAdd);
-if (!slotToUpdate) {
-  // 👇 时间段不存在就添加进去
-  slotToUpdate = {
-    time: timeToAdd,
-    available: true
-  };
-  daySlot.times.push(slotToUpdate);
-  daySlot.slots += 1;
-} else if (!slotToUpdate.available) {
-  // 👇 已存在但不可用，更新为可用
-  slotToUpdate.available = true;
-  daySlot.slots += 1;
-}
+      if (!slotToUpdate) {
+        // 👇 时间段不存在就添加进去
+        slotToUpdate = {
+          time: timeToAdd,
+          available: true
+        };
+        daySlot.times.push(slotToUpdate);
+        daySlot.slots += 1;
+      } else if (!slotToUpdate.available) {
+        // 👇 已存在但不可用，更新为可用
+        slotToUpdate.available = true;
+        daySlot.slots += 1;
+      }
 
       return { ...doc, availability };
     });
@@ -264,9 +264,20 @@ if (!slotToUpdate) {
 
           <div className="time-options">
             <label>Start Time:</label>
-            <input type="time" value={startTime} onChange={e => setStartTime(e.target.value)} />
+            <select value={startTime} onChange={e => setStartTime(e.target.value)}>
+              <option value="">Select time</option>
+              {fullTimeSlots.map((time, i) => (
+                <option key={i} value={time}>{time}</option>
+              ))}
+            </select>
+
             <label>End Time:</label>
-            <input type="time" value={endTime} onChange={e => setEndTime(e.target.value)} />
+            <select value={endTime} onChange={e => setEndTime(e.target.value)}>
+              <option value="">Select time</option>
+              {fullTimeSlots.map((time, i) => (
+                <option key={i} value={time}>{time}</option>
+              ))}
+            </select>
           </div>
 
           <label>Or Select a Date:</label>
