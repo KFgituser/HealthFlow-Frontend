@@ -185,7 +185,7 @@ import Breadcrumb from '../components/Breadcrumb';
                     
                     return (
                      <div
-                        className="appointment-card-doctor d-flex align-items-center justify-content-center gap-5"
+                        className="appointment-card d-flex align-items-center justify-content-center gap-5"
                         style={{
                             padding: '20px',
                             marginBottom: '16px',
