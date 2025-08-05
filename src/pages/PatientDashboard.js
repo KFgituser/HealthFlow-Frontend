@@ -18,30 +18,32 @@ import { useDoctors } from "../contexts/DoctorContext";
 import SuccessPopup from "../components/SuccessPopup";
 import Breadcrumb from '../components/Breadcrumb';
 import React from 'react';
-const updateDoctorSlots = (doctorId, dateStr, delta, doctors, setDoctors) => {
-  setDoctors(prevDoctors => {
-    const updated = prevDoctors.map(doc => {
-      if (doc.id !== doctorId) return doc;
-      return {
-        ...doc,
-        availability: doc.availability.map(slot => {
-            const parsedSlotDate = new Date(`${slot.date}, ${new Date().getFullYear()}`);
-            const year = parsedSlotDate.getFullYear();
-            const month = String(parsedSlotDate.getMonth() + 1).padStart(2, '0');
-            const day = String(parsedSlotDate.getDate()).padStart(2, '0');
-            const formattedSlotDate = `${year}-${month}-${day}`;
-          if (formattedSlotDate === dateStr) {
-            return { ...slot, slots: slot.slots + delta };
-          }
-          return slot;
-        })
-      };
-    });
 
-    localStorage.setItem("doctors", JSON.stringify(updated));
-    return updated;
-  });
-};
+
+    const updateDoctorSlots = (doctorId, dateStr, delta, doctors, setDoctors) => {
+    setDoctors(prevDoctors => {
+        const updated = prevDoctors.map(doc => {
+        if (doc.id !== doctorId) return doc;
+        return {
+            ...doc,
+            availability: doc.availability.map(slot => {
+                const parsedSlotDate = new Date(`${slot.date}, ${new Date().getFullYear()}`);
+                const year = parsedSlotDate.getFullYear();
+                const month = String(parsedSlotDate.getMonth() + 1).padStart(2, '0');
+                const day = String(parsedSlotDate.getDate()).padStart(2, '0');
+                const formattedSlotDate = `${year}-${month}-${day}`;
+            if (formattedSlotDate === dateStr) {
+                return { ...slot, slots: slot.slots + delta };
+            }
+            return slot;
+            })
+        };
+        });
+
+        localStorage.setItem("doctors", JSON.stringify(updated));
+        return updated;
+    });
+    };
       
 
     export default function PatientDashboard(){
@@ -181,8 +183,7 @@ const updateDoctorSlots = (doctorId, dateStr, delta, doctors, setDoctors) => {
             if (specialtyParam) setSelectedSpecialty(specialtyParam);
             if (distanceParam) setSelectedDistance(Number(distanceParam));
             if (cityParam) setSelectedCity(cityParam);
-        }, []);
-           
+        }, []); 
         
         // find ways to location
         useEffect(() => {
@@ -194,7 +195,6 @@ const updateDoctorSlots = (doctorId, dateStr, delta, doctors, setDoctors) => {
 
         const handleDirections = (origin, destination, mode = "DRIVING") => {
             const directionsService = new window.google.maps.DirectionsService();
-
             directionsService.route(
                 {
                 origin,
@@ -204,7 +204,7 @@ const updateDoctorSlots = (doctorId, dateStr, delta, doctors, setDoctors) => {
                 (result, status) => {
                 if (status === "OK") {
                     setDirections(result);
-                      const route = result.routes[0];
+                    const route = result.routes[0];
                     const leg = route.legs[0];
                     const distance = leg.distance.text;
                     const duration = leg.duration.text;

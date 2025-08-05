@@ -45,3 +45,8 @@
 .appointment-actions button:hover {
   background-color: #f0f0f0;
 }
+
+.left-info {
+  flex: 1;
+  margin-right: 20px; 
+}

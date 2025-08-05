@@ -118,7 +118,7 @@ export default function DoctorDashboard(){
       const existingDateSlot = availability.find(slot => slot.date === formattedDate);
 
       if (existingDateSlot) {
-        // ✅ 日期已存在
+        // 日期已存在
         const existingTime = existingDateSlot.times.find(t => t.time === timeToAdd);
 
         if (existingTime) {
