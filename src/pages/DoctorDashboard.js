@@ -129,11 +129,20 @@ const dateObj = new Date(specificDate);
       }
 
       // 更新时间段
-      const slotToUpdate = daySlot.times.find(slot => slot.time === timeToAdd);
-      if (slotToUpdate && !slotToUpdate.available) {
-        slotToUpdate.available = true;
-        daySlot.slots += 1;
-      }
+      let slotToUpdate = daySlot.times.find(slot => slot.time === timeToAdd);
+if (!slotToUpdate) {
+  // 👇 时间段不存在就添加进去
+  slotToUpdate = {
+    time: timeToAdd,
+    available: true
+  };
+  daySlot.times.push(slotToUpdate);
+  daySlot.slots += 1;
+} else if (!slotToUpdate.available) {
+  // 👇 已存在但不可用，更新为可用
+  slotToUpdate.available = true;
+  daySlot.slots += 1;
+}
 
       return { ...doc, availability };
     });
