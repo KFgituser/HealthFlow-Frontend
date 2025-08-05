@@ -6,6 +6,7 @@ import styles from '../styles/HomePage.module.css';
 import '../styles/DoctorDashboard.css'
 import { useDoctors } from "../contexts/DoctorContext";
 import { fullTimeSlots } from '../data/dummyDoctors';
+import { fillMissingSlots } from "../data/dummyDoctors";
 
 export default function DoctorDashboard(){
     const API_BASE = process.env.REACT_APP_API_BASE_URL;
@@ -94,69 +95,68 @@ export default function DoctorDashboard(){
     };
     //add a slot
     const handleSave = () => {
-  const doctorId = parseInt(localStorage.getItem("doctorId"));
-  if (!doctorId || !specificDate || !startTime) {
-    alert("Missing information to save availability");
-    return;
-  }
-const dateObj = new Date(specificDate);
- const formattedDate = dateObj.toLocaleDateString('en-US', {
-  weekday: 'short',
-  month: 'short',
-  day: 'numeric'
-}); // 会直接输出与原有数据格式一致的 "Mon, Jul 29"
+      const doctorId = parseInt(localStorage.getItem("doctorId"));
+      if (!doctorId || !specificDate || !startTime) {
+        alert("Missing information to save availability");
+        return;
+      }
 
-  const timeToAdd = startTime;
+      const dateObj = new Date(specificDate);
+      const formattedDate = dateObj.toLocaleDateString('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric'
+      }).trim(); // "Mon, Jul 29"
 
-  setDoctors(prevDoctors => {
-    const updatedDoctors = prevDoctors.map(doc => {
-      if (doc.id !== doctorId) return doc;
+      const timeToAdd = startTime;
+
+      setDoctors(prevDoctors => {
+        const updatedDoctors = prevDoctors.map(doc => {
+          if (doc.id !== doctorId) return doc;
 
       const availability = [...doc.availability];
-      let daySlot = availability.find(slot => slot.date === formattedDate.trim());
+      const existingDateSlot = availability.find(slot => slot.date === formattedDate);
 
-      if (!daySlot) {
-        // 新建日期 slot
-        daySlot = {
-          date: formattedDate.trim(),
-          slots: 0,
-          times: fullTimeSlots.map(time => ({
-            time,
-            available: false
-          }))
-        };
-        availability.push(daySlot);
+      if (existingDateSlot) {
+        // ✅ 日期已存在：只更新 times 列表
+        const updatedTimes = [...existingDateSlot.times];
+        const existingTime = updatedTimes.find(t => t.time === timeToAdd);
+
+        if (existingTime) {
+          if (!existingTime.available) {
+            existingTime.available = true;
+          }
+        } else {
+          updatedTimes.push({ time: timeToAdd, available: true });
+        }
+
+        // 使用 fillMissingSlots 保持结构一致
+        existingDateSlot.times = fillMissingSlots(updatedTimes);
+        existingDateSlot.slots = existingDateSlot.times.filter(t => t.available).length;
+
+      } else {
+        // ✅ 日期不存在：新增日期 entry
+        const newTimes = fillMissingSlots([{ time: timeToAdd, available: true }]);
+        availability.push({
+          date: formattedDate,
+          times: newTimes,
+          slots: 1
+        });
       }
 
-      // 更新时间段
-      let slotToUpdate = daySlot.times.find(slot => slot.time === timeToAdd);
-      if (!slotToUpdate) {
-        // 👇 时间段不存在就添加进去
-        slotToUpdate = {
-          time: timeToAdd,
-          available: true
-        };
-        daySlot.times.push(slotToUpdate);
-        daySlot.slots += 1;
-      } else if (!slotToUpdate.available) {
-        // 👇 已存在但不可用，更新为可用
-        slotToUpdate.available = true;
-        daySlot.slots += 1;
-      }
+            return { ...doc, availability };
+          });
 
-      return { ...doc, availability };
-    });
+          localStorage.setItem("doctors", JSON.stringify(updatedDoctors));
+          return updatedDoctors;
+        });
 
-    localStorage.setItem("doctors", JSON.stringify(updatedDoctors));
-    return updatedDoctors;
-  });
-
-  alert("Availability slot added successfully.");
-  setSelectedDay('');
-  setRepeat('none');
-  setStartTime('');
-  setEndTime('');
-  setSpecificDate('');
+        alert("Availability slot added successfully.");
+        setSelectedDay('');
+        setRepeat('none');
+        setStartTime('');
+        setEndTime('');
+        setSpecificDate('');
     };
     //delete a slot
     const handleDelete = () => {

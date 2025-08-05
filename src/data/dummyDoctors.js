@@ -6,7 +6,7 @@ export const fullTimeSlots = [
   "15:30", "16:00"
 ];
 
-function fillMissingSlots(times) {
+export function fillMissingSlots(times) {
   const timeMap = Object.fromEntries(times.map(t => [t.time, t.available]));
   return fullTimeSlots.map(t => ({
     time: t,
