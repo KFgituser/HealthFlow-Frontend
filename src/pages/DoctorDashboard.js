@@ -34,13 +34,13 @@ export default function DoctorDashboard(){
     console.log("🔍 doctors", doctors);
     console.log("✅ doctorId from localStorage:", doctorId);
     if (!doctorId || !doctors.length) {
-      console.warn("doctorId 或 doctors is not ready");
+      console.warn("doctorId or doctors is not ready");
     return;
     }
 
     const doctor = doctors.find(d => d.id === doctorId);
     if (!doctor || !specificDate) {
-      console.warn("⚠️ 找不到匹配的 doctor");
+      console.warn("⚠️ can't find a matched doctor");
       setAppointments([]);
       return;
     }
@@ -102,8 +102,10 @@ export default function DoctorDashboard(){
         }
 
         const targetDate = new Date(specificDate);
-        const options = { weekday: 'short', month: 'short', day: 'numeric' };
-        const formattedDate = targetDate.toLocaleDateString('en-US', options); // e.g., "Mon, Jul 29"
+        const weekday = targetDate.toLocaleDateString('en-US', { weekday: 'short' }); // Tue
+        const month = targetDate.toLocaleDateString('en-US', { month: 'short' });     // Jul
+        const day = targetDate.getDate(); // 29
+        const formattedDate = `${weekday}, ${month} ${day}`; // "Tue, Jul 29"
 
         const timeToAdd = startTime;
 
