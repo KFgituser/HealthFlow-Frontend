@@ -359,7 +359,9 @@ const updateDoctorSlots = (doctorId, dateStr, delta, doctors, setDoctors) => {
                             {doctor.availability.length > 0 ? (
                             <div className="availability-wrapper mt-3"> 
                                 <div className="d-flex flex-wrap gap-1 mt-2">
-                                {doctor.availability.map((slot, index) => (
+                                {doctor.availability
+                                    .filter(slot => Array.isArray(slot.times) && slot.times.length > 0)
+                                    .map((slot, index) => (
                                 <React.Fragment key={index}>  
                                     <div
                                         className={`availability-button ${slot.slots === 0 ? 'no-slots' : 'has-slots'}`}
