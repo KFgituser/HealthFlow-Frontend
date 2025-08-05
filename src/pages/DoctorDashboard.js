@@ -99,12 +99,12 @@ export default function DoctorDashboard(){
     alert("Missing information to save availability");
     return;
   }
-
-  const dateObj = new Date(specificDate);
-  const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
-  const month = dateObj.toLocaleDateString('en-US', { month: 'short' });
-  const day = dateObj.getDate();
-  const formattedDate = `${weekday}, ${month} ${day}`;  // E.g., "Mon, Jul 29"
+const dateObj = new Date(specificDate);
+ const formattedDate = dateObj.toLocaleDateString('en-US', {
+  weekday: 'short',
+  month: 'short',
+  day: 'numeric'
+}); // 会直接输出与原有数据格式一致的 "Mon, Jul 29"
 
   const timeToAdd = startTime;
 
@@ -118,7 +118,7 @@ export default function DoctorDashboard(){
       if (!daySlot) {
         // 新建日期 slot
         daySlot = {
-          date: formattedDate,
+          date: formattedDate.trim(),
           slots: 0,
           times: fullTimeSlots.map(time => ({
             time,
