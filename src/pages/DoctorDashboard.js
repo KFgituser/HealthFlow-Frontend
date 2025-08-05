@@ -94,60 +94,61 @@ export default function DoctorDashboard(){
     };
     
     const handleSave = () => {
-        const doctorIdStr = localStorage.getItem("doctorId");
-        const doctorId = doctorIdStr && !isNaN(doctorIdStr) ? parseInt(doctorIdStr) : null;
-        if (!doctorId || !specificDate || !startTime) {
-          alert("Missing information to save availability");
-          return;
-        }
+  const doctorId = parseInt(localStorage.getItem("doctorId"));
+  if (!doctorId || !specificDate || !startTime) {
+    alert("Missing information to save availability");
+    return;
+  }
 
-        const targetDate = new Date(specificDate);
-        const weekday = targetDate.toLocaleDateString('en-US', { weekday: 'short' }); // Tue
-        const month = targetDate.toLocaleDateString('en-US', { month: 'short' });     // Jul
-        const day = targetDate.getDate(); // 29
-        const formattedDate = `${weekday}, ${month} ${day}`; // "Tue, Jul 29"
+  const dateObj = new Date(specificDate);
+  const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
+  const month = dateObj.toLocaleDateString('en-US', { month: 'short' });
+  const day = dateObj.getDate();
+  const formattedDate = `${weekday}, ${month} ${day}`;  // E.g., "Mon, Jul 29"
 
-        const timeToAdd = startTime;
+  const timeToAdd = startTime;
 
-        setDoctors(prevDoctors => {
-          const updatedDoctors = prevDoctors.map(doc => {
-            if (doc.id !== doctorId) return doc;
+  setDoctors(prevDoctors => {
+    const updatedDoctors = prevDoctors.map(doc => {
+      if (doc.id !== doctorId) return doc;
 
-            const availability = [...doc.availability];
-            const daySlot = availability.find(slot => slot.date === formattedDate);
+      const availability = [...doc.availability];
+      let daySlot = availability.find(slot => slot.date === formattedDate);
 
-            if (daySlot) {
-              const timeSlot = daySlot.times.find(t => t.time === timeToAdd);
-              if (timeSlot && !timeSlot.available) {
-                timeSlot.available = true;
-                daySlot.slots += 1;
-              }
-            } else {
-              // If date doesn't exist, create new
-              availability.push({
-                date: formattedDate,
-                slots: 1,
-                times: fullTimeSlots.map(time => ({
-                  time,
-                  available: time === timeToAdd
-                }))
-              });
-            }
+      if (!daySlot) {
+        // 新建日期 slot
+        daySlot = {
+          date: formattedDate,
+          slots: 0,
+          times: fullTimeSlots.map(time => ({
+            time,
+            available: false
+          }))
+        };
+        availability.push(daySlot);
+      }
 
-            return { ...doc, availability };
-          });
+      // 更新时间段
+      const slotToUpdate = daySlot.times.find(slot => slot.time === timeToAdd);
+      if (slotToUpdate && !slotToUpdate.available) {
+        slotToUpdate.available = true;
+        daySlot.slots += 1;
+      }
 
-          localStorage.setItem("doctors", JSON.stringify(updatedDoctors));
-          return updatedDoctors;
-        });
+      return { ...doc, availability };
+    });
 
-        alert("Availability slot added successfully.");
-        setSelectedDay('');
-        setRepeat('none');
-        setStartTime('');
-        setEndTime('');
-        setSpecificDate('');
-      };
+    localStorage.setItem("doctors", JSON.stringify(updatedDoctors));
+    return updatedDoctors;
+  });
+
+  alert("Availability slot added successfully.");
+  setSelectedDay('');
+  setRepeat('none');
+  setStartTime('');
+  setEndTime('');
+  setSpecificDate('');
+};
 
       const handleCancel = () => {
         setSelectedDay('');
