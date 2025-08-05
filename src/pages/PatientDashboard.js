@@ -29,7 +29,7 @@ const updateDoctorSlots = (doctorId, dateStr, delta, doctors, setDoctors) => {
             const year = parsedSlotDate.getFullYear();
             const month = String(parsedSlotDate.getMonth() + 1).padStart(2, '0');
             const day = String(parsedSlotDate.getDate()).padStart(2, '0');
-            const formattedSlotDate = `${year}-${month}-${day}`.trim();
+            const formattedSlotDate = `${year}-${month}-${day}`;
           if (formattedSlotDate === dateStr) {
             return { ...slot, slots: slot.slots + delta };
           }
@@ -359,9 +359,7 @@ const updateDoctorSlots = (doctorId, dateStr, delta, doctors, setDoctors) => {
                             {doctor.availability.length > 0 ? (
                             <div className="availability-wrapper mt-3"> 
                                 <div className="d-flex flex-wrap gap-1 mt-2">
-                                {doctor.availability
-                                    .filter(slot => Array.isArray(slot.times) && slot.times.length > 0)
-                                    .map((slot, index) => (
+                                {doctor.availability.map((slot, index) => (
                                 <React.Fragment key={index}>  
                                     <div
                                         className={`availability-button ${slot.slots === 0 ? 'no-slots' : 'has-slots'}`}
