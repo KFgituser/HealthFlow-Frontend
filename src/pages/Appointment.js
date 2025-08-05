@@ -185,7 +185,7 @@ import Breadcrumb from '../components/Breadcrumb';
                     
                     return (
                      <div
-                        className="appointment-card d-flex align-items-center justify-content-between gap-3 flex-wrap"
+                        className="appointment-card d-flex align-items-center gap-3 flex-wrap"
                         key={index}
                         >
                         
@@ -217,7 +217,7 @@ import Breadcrumb from '../components/Breadcrumb';
                             src={doctor.imageUrl || '/images/default-doctor.png'}
                             alt={doctor.name}
                             className="rounded-circle"
-                            style={{ width: '300px', height: '300px', objectFit: 'cover' }}
+                            style={{ width: '270px', height: '27px', objectFit: 'cover' }}
                             />
                             </div>
                         )}
