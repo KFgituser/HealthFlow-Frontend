@@ -95,76 +95,75 @@ export default function DoctorDashboard(){
     };
     //add a slot
     const handleSave = () => {
-      const doctorId = parseInt(localStorage.getItem("doctorId"));
-      if (!doctorId || !specificDate || !startTime) {
-        alert("Missing information to save availability");
-        return;
-      }
+    const doctorId = parseInt(localStorage.getItem("doctorId"));
+    if (!doctorId || !specificDate || !startTime) {
+      alert("Missing information to save availability");
+      return;
+    }
 
-      const dateObj = new Date(specificDate);
-      const formattedDate = dateObj.toLocaleDateString('en-US', {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric'
-      }).trim(); // "Mon, Jul 29"
+    const dateObj = new Date(specificDate);
+    const formattedDate = dateObj.toLocaleDateString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric'
+    }).trim(); // "Mon, Jul 29"
 
-      const timeToAdd = startTime;
+    const timeToAdd = startTime;
 
-      setDoctors(prevDoctors => {
-        const updatedDoctors = prevDoctors.map(doc => {
-          if (doc.id !== doctorId) return doc;
+    setDoctors(prevDoctors => {
+    const updatedDoctors = prevDoctors.map(doc => {
+      if (doc.id !== doctorId) return doc;
 
       const availability = [...doc.availability];
       const existingDateSlot = availability.find(slot => slot.date === formattedDate);
 
       if (existingDateSlot) {
-        // ✅ 日期已存在：只更新 times 列表
-        const updatedTimes = [...existingDateSlot.times];
-        const existingTime = updatedTimes.find(t => t.time === timeToAdd);
+        // ✅ 日期已存在
+        const existingTime = existingDateSlot.times.find(t => t.time === timeToAdd);
 
         if (existingTime) {
+          // 已存在该时间段，更新为可用
           if (!existingTime.available) {
             existingTime.available = true;
           }
         } else {
-          updatedTimes.push({ time: timeToAdd, available: true });
+          // 添加新的时间段
+          existingDateSlot.times.push({ time: timeToAdd, available: true });
         }
 
-        // 使用 fillMissingSlots 保持结构一致
-        existingDateSlot.times = fillMissingSlots(updatedTimes);
+        // 更新 slots 数量
         existingDateSlot.slots = existingDateSlot.times.filter(t => t.available).length;
 
       } else {
-        // ✅ 日期不存在：新增日期 entry
-        const newTimes = fillMissingSlots([{ time: timeToAdd, available: true }]);
+        // ✅ 日期不存在，创建新日期 slot，只添加一个时间段
         availability.push({
           date: formattedDate,
-          times: newTimes,
+          times: [{ time: timeToAdd, available: true }],
           slots: 1
         });
       }
 
-            return { ...doc, availability };
-          });
+      return { ...doc, availability };
+    });
 
-          localStorage.setItem("doctors", JSON.stringify(updatedDoctors));
-          return updatedDoctors;
-        });
+    localStorage.setItem("doctors", JSON.stringify(updatedDoctors));
+    return updatedDoctors;
+  });
 
-        alert("Availability slot added successfully.");
-        setSelectedDay('');
-        setRepeat('none');
-        setStartTime('');
-        setEndTime('');
-        setSpecificDate('');
+  alert("Availability slot added successfully.");
+  setSelectedDay('');
+  setRepeat('none');
+  setStartTime('');
+  setEndTime('');
+  setSpecificDate('');
     };
     //delete a slot
     const handleDelete = () => {
-  const doctorId = parseInt(localStorage.getItem("doctorId"));
-  if (!doctorId || !specificDate || !startTime) {
-    alert("Missing information to delete availability");
-    return;
-  }
+    const doctorId = parseInt(localStorage.getItem("doctorId"));
+    if (!doctorId || !specificDate || !startTime) {
+      alert("Missing information to delete availability");
+      return;
+    }
 
   const dateObj = new Date(specificDate);
   const formattedDate = dateObj.toLocaleDateString('en-US', {
