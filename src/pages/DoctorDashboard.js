@@ -94,6 +94,7 @@ export default function DoctorDashboard(){
             }
     };
     //add a slot
+    
     const handleSave = () => {
     const doctorId = parseInt(localStorage.getItem("doctorId"));
     if (!doctorId || !specificDate || !startTime) {
@@ -106,17 +107,17 @@ export default function DoctorDashboard(){
     weekday: 'short',
     month: 'short',
     day: 'numeric'
-    }).trim(); // "Mon, Jul 29"
+    }).replace(/\s+/g, ' ').trim();  // "Mon, Jul 29"
 
     const timeToAdd = startTime;
 
     setDoctors(prevDoctors => {
     const updatedDoctors = prevDoctors.map(doc => {
       if (doc.id !== doctorId) return doc;
-
+      
       const availability = [...doc.availability];
       const existingDateSlot = availability.find(slot => slot.date === formattedDate);
-
+      
       if (existingDateSlot) {
         // ✅ 日期已存在
         const existingTime = existingDateSlot.times.find(t => t.time === timeToAdd);
@@ -142,7 +143,10 @@ export default function DoctorDashboard(){
           slots: 1
         });
       }
-
+      availability = availability.filter(
+        (slot, index, self) =>
+          index === self.findIndex(s => s.date === slot.date)
+      );
       return { ...doc, availability };
     });
 
@@ -170,7 +174,7 @@ export default function DoctorDashboard(){
     weekday: 'short',
     month: 'short',
     day: 'numeric'
-  });
+  }).replace(/\s+/g, ' ').trim();
 
   setDoctors(prevDoctors => {
     const updatedDoctors = prevDoctors.map(doc => {
@@ -208,6 +212,7 @@ export default function DoctorDashboard(){
         setStartTime('');
         setEndTime('');
         setSpecificDate('');
+        setAppointments([]);
     };
 
     const handleDateChange = (e) => {
