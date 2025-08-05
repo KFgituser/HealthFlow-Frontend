@@ -185,7 +185,7 @@ import Breadcrumb from '../components/Breadcrumb';
                     
                     return (
                      <div
-                        className="appointment-card d-flex align-items-center justify-content-between gap-5 flex-wrap"
+                        className="appointment-card d-flex align-items-center justify-content-between gap-3 flex-wrap"
                         key={index}
                         >
                         

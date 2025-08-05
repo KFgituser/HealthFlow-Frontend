@@ -5,11 +5,12 @@ import { useNavigate, Link } from "react-router-dom";
 import styles from '../styles/HomePage.module.css';
 import '../styles/DoctorDashboard.css'
 import { useDoctors } from "../contexts/DoctorContext";
+import { fullTimeSlots } from '../data/dummyDoctors';
 
 export default function DoctorDashboard(){
     const API_BASE = process.env.REACT_APP_API_BASE_URL;
     const navigate = useNavigate();
-    const {doctors = []} = useDoctors(); //Get the globally shared doctors from context.
+    const {doctors = [], setDoctors} = useDoctors(); //Get the globally shared doctors from context.
     const [view, setView] = useState('dashboard'); // or 'viewSchedule', 'editSlot'
    
     
@@ -93,9 +94,57 @@ export default function DoctorDashboard(){
     };
     
     const handleSave = () => {
-        // Example logic - send availability to backend
-        console.log('Saving availability:', { selectedDay, repeat, startTime, endTime, specificDate });
-        // TODO: call API to save availability
+        const doctorIdStr = localStorage.getItem("doctorId");
+        const doctorId = doctorIdStr && !isNaN(doctorIdStr) ? parseInt(doctorIdStr) : null;
+        if (!doctorId || !specificDate || !startTime) {
+          alert("Missing information to save availability");
+          return;
+        }
+
+        const targetDate = new Date(specificDate);
+        const options = { weekday: 'short', month: 'short', day: 'numeric' };
+        const formattedDate = targetDate.toLocaleDateString('en-US', options); // e.g., "Mon, Jul 29"
+
+        const timeToAdd = startTime;
+
+        setDoctors(prevDoctors => {
+          const updatedDoctors = prevDoctors.map(doc => {
+            if (doc.id !== doctorId) return doc;
+
+            const availability = [...doc.availability];
+            const daySlot = availability.find(slot => slot.date === formattedDate);
+
+            if (daySlot) {
+              const timeSlot = daySlot.times.find(t => t.time === timeToAdd);
+              if (timeSlot && !timeSlot.available) {
+                timeSlot.available = true;
+                daySlot.slots += 1;
+              }
+            } else {
+              // If date doesn't exist, create new
+              availability.push({
+                date: formattedDate,
+                slots: 1,
+                times: fullTimeSlots.map(time => ({
+                  time,
+                  available: time === timeToAdd
+                }))
+              });
+            }
+
+            return { ...doc, availability };
+          });
+
+          localStorage.setItem("doctors", JSON.stringify(updatedDoctors));
+          return updatedDoctors;
+        });
+
+        alert("Availability slot added successfully.");
+        setSelectedDay('');
+        setRepeat('none');
+        setStartTime('');
+        setEndTime('');
+        setSpecificDate('');
       };
 
       const handleCancel = () => {

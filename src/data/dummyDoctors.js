@@ -1,6 +1,6 @@
 // use dummy doctor data
 
-const fullTimeSlots = [
+export const fullTimeSlots = [
   "09:30", "10:00", "10:30", "11:00",
   "13:00", "13:30", "14:00", "15:00",
   "15:30", "16:00"
@@ -824,3 +824,4 @@ const dummyDoctors = [
     }
 ];
         export default dummyDoctors;
+        
