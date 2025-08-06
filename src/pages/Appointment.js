@@ -64,17 +64,65 @@ import Breadcrumb from '../components/Breadcrumb';
         }, []);
         //define handleReschedule and handleCancel
         //Reschedule
-        const handleReschedule = async (appointmentId, doctorId) => {
+        const handleReschedule = async (appointment) => {
             const confirmed = window.confirm("This will delete your current appointment. Continue?");
-            if (!confirmed) return;
+  if (!confirmed) return;
 
-            try {
-                await axios.delete(`/api/appointments/${appointmentId}`, { withCredentials: true });
-                
-                setAppointments(prev => prev.filter(appt => appt.appointmentId !== appointmentId));
+  try {
+    // 1. Retrieve all local appointment data
+    const allAppointments = JSON.parse(localStorage.getItem("dummyAppointments") || "[]");
 
+    // 2. Find and delete the specific appointment
+    const updatedAppointments = allAppointments.filter(
+      (appt) =>
+        !(
+          appt.doctorId === appointment.doctorId &&
+          appt.date === appointment.date &&
+          appt.startTime === appointment.startTime
+        )
+    );
+
+    localStorage.setItem("dummyAppointments", JSON.stringify(updatedAppointments));
+    setAppointments(updatedAppointments);
+
+    // 3. Restore the doctor's slot count for that date by +1
+    const formattedDate = new Date(appointment.date).toISOString().split("T")[0];
+    updateDoctorSlots(
+      appointment.doctorId,
+      formattedDate,
+      +1,
+      doctors,
+      setDoctors
+    );
+
+    // 4. Set the availability of the specific time slot back to true
+    setDoctors(prevDoctors => {
+      const updatedDoctors = prevDoctors.map(doc => {
+        if (doc.id !== appointment.doctorId) return doc;
+
+        return {
+          ...doc,
+          availability: doc.availability.map(slot => {
+            const slotDate = new Date(`${slot.date}, ${new Date().getFullYear()}`).toISOString().split("T")[0];
+            if (slotDate !== formattedDate) return slot;
+
+            const updatedTimes = slot.times.map(t => {
+              if (t.time === appointment.startTime) {
+                return { ...t, available: true };
+              }
+              return t;
+            });
+
+            return { ...slot, times: updatedTimes };
+          })
+        };
+      });
+
+      localStorage.setItem("doctors", JSON.stringify(updatedDoctors));
+      return updatedDoctors;
+    });
                 // Navigate to PatientDashboard and scroll to the doctor section
-                navigate(`/patient-dashboard?scrollToDoctor=${doctorId}`);
+                navigate(`/patient-dashboard?scrollToDoctor=${appointment.doctorId}`);
             } catch (error) {
                 alert("Failed to reschedule.");
                 console.error("Reschedule error", error);
@@ -106,7 +154,7 @@ import Breadcrumb from '../components/Breadcrumb';
     setDoctors
   );
 
-  // ✅ 恢复 doctor 的 availability.time 段
+  // doctor availability.time 
   setDoctors(prevDoctors => {
     const updatedDoctors = prevDoctors.map(doc => {
       if (doc.id !== appointmentToRemove.doctorId) return doc;
@@ -133,7 +181,7 @@ import Breadcrumb from '../components/Breadcrumb';
     return updatedDoctors;
   });
             // 5. Show confirmation alert
-            alert("Appointment cancelled (virtual).");
+            alert("Appointment cancelled .");
             };
 
         // initialize appointments and setAppointments
@@ -205,7 +253,7 @@ import Breadcrumb from '../components/Breadcrumb';
                             <p>Time: {appt.startTime} - {appt.endTime}</p>
                             <p>Status: {appt.status}</p>
                             <div className="appointment-actions">
-                            <button onClick={() => handleReschedule(appt.appointmentId, doctorId)}>Reschedule</button>
+                            <button onClick={() => handleReschedule(appt)}>Reschedule</button>
                             <button onClick={() => handleCancel(index)}>Cancel</button>
                             </div>
                         </div>
