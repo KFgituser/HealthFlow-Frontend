@@ -67,8 +67,6 @@ import { Modal, Button } from 'react-bootstrap';
         //define handleReschedule and handleCancel
         //Reschedule
             const handleReschedule = async (appointment) => {
-            const confirmed = window.confirm("This will delete your current appointment. Continue?");
-            if (!confirmed) return;
 
             try {
                 // 1. Retrieve all local appointment data
@@ -344,7 +342,7 @@ import { Modal, Button } from 'react-bootstrap';
                         <Modal.Title>Confirm Reschedule</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        Are you sure you want to reschedule this appointment?
+                        Are you sure you want to reschedule this appointment? This will delete your current appointment!
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="secondary" onClick={() => setShowModal(false)}>
