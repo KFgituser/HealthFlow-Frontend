@@ -6,7 +6,7 @@ import axios from 'axios';
 import { useDoctors } from "../contexts/DoctorContext";
 
 import Breadcrumb from '../components/Breadcrumb';
-
+import { Modal, Button } from 'react-bootstrap';
     // Update a doctor's available slots
         const updateDoctorSlots = (doctorId, dateStr, delta, doctors, setDoctors) => {
         setDoctors(prevDoctors => {
@@ -36,6 +36,8 @@ import Breadcrumb from '../components/Breadcrumb';
         const API_BASE = process.env.REACT_APP_API_BASE_URL;
         const navigate = useNavigate();
         const { doctors, setDoctors } = useDoctors();
+        const [showModal, setShowModal] = useState(false);
+        const [selectedAppointment, setSelectedAppointment] = useState(null);
         //logout  
         const handleLogout = async () => {
             try {
@@ -64,63 +66,63 @@ import Breadcrumb from '../components/Breadcrumb';
         }, []);
         //define handleReschedule and handleCancel
         //Reschedule
-        const handleReschedule = async (appointment) => {
+            const handleReschedule = async (appointment) => {
             const confirmed = window.confirm("This will delete your current appointment. Continue?");
-  if (!confirmed) return;
+            if (!confirmed) return;
 
-  try {
-    // 1. Retrieve all local appointment data
-    const allAppointments = JSON.parse(localStorage.getItem("dummyAppointments") || "[]");
+            try {
+                // 1. Retrieve all local appointment data
+                const allAppointments = JSON.parse(localStorage.getItem("dummyAppointments") || "[]");
 
-    // 2. Find and delete the specific appointment
-    const updatedAppointments = allAppointments.filter(
-      (appt) =>
-        !(
-          appt.doctorId === appointment.doctorId &&
-          appt.date === appointment.date &&
-          appt.startTime === appointment.startTime
-        )
-    );
+                // 2. Find and delete the specific appointment
+                const updatedAppointments = allAppointments.filter(
+                (appt) =>
+                    !(
+                    appt.doctorId === appointment.doctorId &&
+                    appt.date === appointment.date &&
+                    appt.startTime === appointment.startTime
+                    )
+                );
 
-    localStorage.setItem("dummyAppointments", JSON.stringify(updatedAppointments));
-    setAppointments(updatedAppointments);
+                localStorage.setItem("dummyAppointments", JSON.stringify(updatedAppointments));
+                setAppointments(updatedAppointments);
 
-    // 3. Restore the doctor's slot count for that date by +1
-    const formattedDate = new Date(appointment.date).toISOString().split("T")[0];
-    updateDoctorSlots(
-      appointment.doctorId,
-      formattedDate,
-      +1,
-      doctors,
-      setDoctors
-    );
+                // 3. Restore the doctor's slot count for that date by +1
+                const formattedDate = new Date(appointment.date).toISOString().split("T")[0];
+                updateDoctorSlots(
+                appointment.doctorId,
+                formattedDate,
+                +1,
+                doctors,
+                setDoctors
+                );
 
-    // 4. Set the availability of the specific time slot back to true
-    setDoctors(prevDoctors => {
-      const updatedDoctors = prevDoctors.map(doc => {
-        if (doc.id !== appointment.doctorId) return doc;
+                // 4. Set the availability of the specific time slot back to true
+                setDoctors(prevDoctors => {
+                const updatedDoctors = prevDoctors.map(doc => {
+                    if (doc.id !== appointment.doctorId) return doc;
 
-        return {
-          ...doc,
-          availability: doc.availability.map(slot => {
-            const slotDate = new Date(`${slot.date}, ${new Date().getFullYear()}`).toISOString().split("T")[0];
-            if (slotDate !== formattedDate) return slot;
+                    return {
+                    ...doc,
+                    availability: doc.availability.map(slot => {
+                        const slotDate = new Date(`${slot.date}, ${new Date().getFullYear()}`).toISOString().split("T")[0];
+                        if (slotDate !== formattedDate) return slot;
 
-            const updatedTimes = slot.times.map(t => {
-              if (t.time === appointment.startTime) {
-                return { ...t, available: true };
-              }
-              return t;
-            });
+                        const updatedTimes = slot.times.map(t => {
+                        if (t.time === appointment.startTime) {
+                            return { ...t, available: true };
+                        }
+                        return t;
+                        });
 
-            return { ...slot, times: updatedTimes };
-          })
-        };
-      });
+                        return { ...slot, times: updatedTimes };
+                    })
+                    };
+                });
 
-      localStorage.setItem("doctors", JSON.stringify(updatedDoctors));
-      return updatedDoctors;
-    });
+                localStorage.setItem("doctors", JSON.stringify(updatedDoctors));
+                return updatedDoctors;
+                });
                 // Navigate to PatientDashboard and scroll to the doctor section
                 navigate(`/patient-dashboard?scrollToDoctor=${appointment.doctorId}`);
             } catch (error) {
@@ -253,7 +255,14 @@ import Breadcrumb from '../components/Breadcrumb';
                             <p>Time: {appt.startTime} - {appt.endTime}</p>
                             <p>Status: {appt.status}</p>
                             <div className="appointment-actions">
-                            <button onClick={() => handleReschedule(appt)}>Reschedule</button>
+                            <button
+                                onClick={() => {
+                                    setSelectedAppointment(appt);
+                                    setShowModal(true);
+                                }}
+                                >
+                                Reschedule
+                            </button>
                             <button onClick={() => handleCancel(index)}>Cancel</button>
                             </div>
                         </div>
@@ -328,7 +337,30 @@ import Breadcrumb from '../components/Breadcrumb';
                 <footer className="bg-dark text-white text-center py-3">
                     <small>© 2025 HealthFlow.    Terms | Privacy </small>
                 </footer>
-       
+
+                {/* Modal Popup components */}
+                <Modal show={showModal} onHide={() => setShowModal(false)}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Confirm Reschedule</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        Are you sure you want to reschedule this appointment?
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setShowModal(false)}>
+                        Cancel
+                        </Button>
+                        <Button
+                        variant="danger"
+                        onClick={() => {
+                            handleReschedule(selectedAppointment);
+                            setShowModal(false);
+                        }}
+                        >
+                        Yes, Reschedule
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
         </>
     );
     };

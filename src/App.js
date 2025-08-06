@@ -35,7 +35,7 @@ import './App.css';
 import Appointment from './pages/Appointment';
 import { DoctorProvider } from './contexts/DoctorContext';
 
-
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   // keep logged in
