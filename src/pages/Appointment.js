@@ -64,17 +64,17 @@ import Breadcrumb from '../components/Breadcrumb';
         }, []);
         //define handleReschedule and handleCancel
         //Reschedule
-        const handleReschedule = async (id) => {
+        const handleReschedule = async (appointmentId, doctorId) => {
             const confirmed = window.confirm("This will delete your current appointment. Continue?");
             if (!confirmed) return;
 
             try {
-                await axios.delete(`/api/appointments/${id}`, { withCredentials: true });
+                await axios.delete(`/api/appointments/${appointmentId}`, { withCredentials: true });
                 
-                setAppointments(prev => prev.filter(appt => appt.appointmentId !== id));
+                setAppointments(prev => prev.filter(appt => appt.appointmentId !== appointmentId));
 
-                // then navigate
-                navigate('/patient-dashboard');
+                // Navigate to PatientDashboard and scroll to the doctor section
+                navigate(`/patient-dashboard?scrollToDoctor=${doctorId}`);
             } catch (error) {
                 alert("Failed to reschedule.");
                 console.error("Reschedule error", error);
@@ -180,8 +180,8 @@ import Breadcrumb from '../components/Breadcrumb';
                 ) : (
                     appointments.map((appt, index) => {
                     console.log("Appointment object:", appt); 
-               const doctorId = Number(appt.doctor?.id || appt.doctorId);
-              const doctor = doctors.find(doc => doc.id === doctorId);
+                const doctorId = Number(appt.doctor?.id || appt.doctorId);
+                const doctor = doctors.find(doc => doc.id === doctorId);
                     
                     return (
                      <div
@@ -205,7 +205,7 @@ import Breadcrumb from '../components/Breadcrumb';
                             <p>Time: {appt.startTime} - {appt.endTime}</p>
                             <p>Status: {appt.status}</p>
                             <div className="appointment-actions">
-                            <button onClick={() => handleReschedule(appt.appointmentId)}>Reschedule</button>
+                            <button onClick={() => handleReschedule(appt.appointmentId, doctorId)}>Reschedule</button>
                             <button onClick={() => handleCancel(index)}>Cancel</button>
                             </div>
                         </div>
@@ -221,7 +221,7 @@ import Breadcrumb from '../components/Breadcrumb';
                             />
                             </div>
                         )}
-                        </div>
+                    </div>
                     );
                     })
                 )}

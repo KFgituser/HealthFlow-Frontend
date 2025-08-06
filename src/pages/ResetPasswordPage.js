@@ -35,7 +35,7 @@ import axios from 'axios';
 
   try {
     await axios.post(`${API_BASE}/api/users/reset-password`, data, {
-      withCredentials: true, // 如果后端用 cookie 认证就加上，否则可以省略
+      withCredentials: true, // 
       headers: {
         'Content-Type': 'application/json'
       }

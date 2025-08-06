@@ -6,7 +6,7 @@ import virtualPatient from '../data/virtualPatientLocation';
 import { DirectionsRenderer } from '@react-google-maps/api';
 import { InfoWindow } from '@react-google-maps/api';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 import { useNavigate, Link, useLocation } from "react-router-dom";  //for mapping doctors
 import styles from '../styles/HomePage.module.css';
@@ -56,7 +56,7 @@ import React from 'react';
         const [directions, setDirections] = useState(null);
         //use dummy doctor data
         const { doctors, setDoctors } = useDoctors();
-        
+        const doctorRefs = useRef({});
         const navigate = useNavigate();
         
         //For bookAppointment
@@ -174,7 +174,8 @@ import React from 'react';
         const doctorLocation = selectedDoctor?.location;
         const [routeInfo, setRouteInfo] = useState(null);
         const location = useLocation();
-            useEffect(() => {
+
+        useEffect(() => {
             const params = new URLSearchParams(location.search);
             const specialtyParam = params.get("specialty");
             const distanceParam = params.get("distance");
@@ -185,6 +186,16 @@ import React from 'react';
             if (cityParam) setSelectedCity(cityParam);
         }, []); 
         
+        useEffect(() => {
+            const params = new URLSearchParams(location.search);
+            const scrollToDoctor = params.get("scrollToDoctor");
+            if (scrollToDoctor && doctorRefs.current[scrollToDoctor]) {
+                setTimeout(() => {
+                doctorRefs.current[scrollToDoctor].scrollIntoView({ behavior: "smooth", block: "center" });
+                }, 500);
+            }
+        }, [doctors]);
+
         // find ways to location
         useEffect(() => {
         if (userLocation && doctorLocation) {
@@ -222,8 +233,8 @@ import React from 'react';
             };
 
 
-
         const [activePage, setActivePage] = useState(1);
+        
 
         return(
         <div>
@@ -335,8 +346,12 @@ import React from 'react';
                         )
                             .slice((activePage - 1) * 5, activePage * 5) // pagination core logic: show 5 doctors per page                        
                             .map((doctor) => (
-                        <div key={doctor.id} className="card mb-3 p-3 shadow-sm">
-                            <div className="d-flex justify-content-start align-items-start gap-5">
+                            <div key={doctor.id} 
+                            ref={(el) => { doctorRefs.current[doctor.id] = el }}
+                            className="card mb-3 p-3 shadow-sm"
+                            >
+
+                        <div className="d-flex justify-content-start align-items-start gap-5">
                             <div className="d-flex flex-column align-items-center me-4">
                             <img
                                 src={doctor.imageUrl}
@@ -344,7 +359,7 @@ import React from 'react';
                                 className="rounded-circle me-3"
                                 style={{ width: "100px", height: "100px", objectFit: "cover" }}
                             />
-                        <div className="text-center">
+                             <div className="text-center">
                                 <h5 className="mb-1">{doctor.name}</h5>
                                 <p className="mb-1 text-muted" style={{ fontSize: '16px', fontWeight: '700' }}>
                                     {doctor.specialty}
