@@ -462,7 +462,7 @@ import React from 'react';
                                         onCloseClick={() => setSelectedDoctor(null)}
                                         >   
                                             <div style={{ fontSize: '14px', lineHeight: '1.5', maxWidth: '220px' }}>
-                                        
+                                            <div><strong>👨‍⚕️ {selectedDoctor.name}</strong></div>
                                             <div>🚶  Walking time: {routeInfo.duration}</div>
                                             <div>📏 Actual distance: {routeInfo.distance}</div>
                                             <div>📍  Address:   
