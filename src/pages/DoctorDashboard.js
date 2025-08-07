@@ -6,14 +6,19 @@ import styles from '../styles/HomePage.module.css';
 import '../styles/DoctorDashboard.css'
 import { useDoctors } from "../contexts/DoctorContext";
 import { fullTimeSlots } from '../data/dummyDoctors';
-import { fillMissingSlots } from "../data/dummyDoctors";
+import SuccessPopup from "../components/SuccessPopup";
+import ErrorPopup from "../components/ErrorPopup";
 
 export default function DoctorDashboard(){
     const API_BASE = process.env.REACT_APP_API_BASE_URL;
     const navigate = useNavigate();
     const {doctors = [], setDoctors} = useDoctors(); //Get the globally shared doctors from context.
     const [view, setView] = useState('dashboard'); // or 'viewSchedule', 'editSlot'
-   
+
+    const [showSuccess, setShowSuccess] = useState(false);
+    const [successMessage, setSuccessMessage] = useState('');
+    const [showError, setShowError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
     
     // State for form
     const [selectedDays, setSelectedDays] = useState([]);
@@ -118,24 +123,24 @@ export default function DoctorDashboard(){
       const existingDateSlot = availability.find(slot => slot.date === formattedDate);
 
       if (existingDateSlot) {
-        // 日期已存在
+        // date already exists
         const existingTime = existingDateSlot.times.find(t => t.time === timeToAdd);
 
         if (existingTime) {
-          // 已存在该时间段，更新为可用
+          // date exists, update
           if (!existingTime.available) {
             existingTime.available = true;
           }
         } else {
-          // 添加新的时间段
+          // add new time slot
           existingDateSlot.times.push({ time: timeToAdd, available: true });
         }
 
-        // 更新 slots 数量
+        // update slots numbers 
         existingDateSlot.slots = existingDateSlot.times.filter(t => t.available).length;
 
       } else {
-        // ✅ 日期不存在，创建新日期 slot，只添加一个时间段
+        // not exists create a new one slot 
         availability.push({
           date: formattedDate,
           times: [{ time: timeToAdd, available: true }],
@@ -150,18 +155,22 @@ export default function DoctorDashboard(){
     return updatedDoctors;
   });
 
-  alert("Availability slot added successfully.");
-  setSelectedDay('');
-  setRepeat('none');
-  setStartTime('');
-  setEndTime('');
-  setSpecificDate('');
-};
+    setSuccessMessage("Availability slot added successfully!");
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 2000);
+    setSelectedDay('');
+    setRepeat('none');
+    setStartTime('');
+    setEndTime('');
+    setSpecificDate('');
+  };
     //delete a slot
     const handleDelete = () => {
     const doctorId = parseInt(localStorage.getItem("doctorId"));
     if (!doctorId || !specificDate || !startTime) {
-      alert("Missing information to delete availability");
+        setErrorMessage("Missing information to save availability.");
+        setShowError(true);
+        setTimeout(() => setShowError(false), 2000); 
       return;
     }
 
@@ -193,13 +202,15 @@ export default function DoctorDashboard(){
     return updatedDoctors;
   });
 
-  alert("Slot deleted successfully.");
-  setSelectedDay('');
-  setRepeat('none');
-  setStartTime('');
-  setEndTime('');
-  setSpecificDate('');
-    };
+    setSuccessMessage("Slot deleted successfully!");
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 2000);
+    setSelectedDay('');
+    setRepeat('none');
+    setStartTime('');
+    setEndTime('');
+    setSpecificDate('');
+      };
 
     const handleCancel = () => {
         setSelectedDay('');
@@ -328,7 +339,7 @@ export default function DoctorDashboard(){
 
           <div className="form-buttons">
             <button onClick={handleSave}>Save</button>
-            <button onClick={handleDelete}>Delete</button>
+            <button onClick={handleDelete} style={{ backgroundColor: '#dc3545', color: 'white' }}>Delete</button>
             <button onClick={handleCancel}>Cancel</button>
             <button onClick={() => setView('viewSchedule')}>back to MySchedule</button>
           </div>
@@ -336,7 +347,9 @@ export default function DoctorDashboard(){
       );
 
     return(
-        <div >  
+        <div > 
+            {showSuccess && <SuccessPopup message={successMessage} />}
+            {showError && <ErrorPopup message={errorMessage} />}
              {/* Top Navbar */}
             <nav className="navbar navbar-light justify-content-between px-4 py-2"> 
                 <Link to="/" className="navbar-brand d-flex align-items-center" style={{ textDecoration: 'none' }}>
