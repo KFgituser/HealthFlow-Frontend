@@ -49,7 +49,7 @@ import ErrorPopup from '../components/ErrorPopup';
           if (role === 'doctor' && response.data.id) {
             localStorage.setItem("doctorId", response.data.id);
           }
-            setShowSuccess(true); // login successful
+          setShowSuccess(true); // login successful
            setTimeout(() => {
             const userReady = localStorage.getItem("user");
             if (userReady) {
@@ -61,8 +61,8 @@ import ErrorPopup from '../components/ErrorPopup';
           
 
         } catch (err) {
-          console.error("❌ 错误状态码:", err.response?.status);
-          console.error("❌ 错误信息:", err.response?.data || err.message);
+          console.error("❌ wrong status:", err.response?.status);
+          console.error("❌ wrong message:", err.response?.data || err.message);
           setShowError(true);   // login failed
           setTimeout(() => setShowError(false), 2000);  
         }

@@ -4,7 +4,7 @@ import ReactDOM from "react-dom";
 export default function ErrorPopup() {
   return ReactDOM.createPortal(
     <>
-      {/* 全屏遮罩 */}
+      {/* full screen */}
       <div
         style={{
           position: "fixed",
@@ -17,7 +17,7 @@ export default function ErrorPopup() {
         }}
       />
 
-      {/* 弹窗内容 */}
+      {/* popup window */}
       <div
         style={{
           position: "fixed",

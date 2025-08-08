@@ -118,7 +118,7 @@ import React from 'react';
             status: "Confirmed"
         };
 
-        // 模拟保存到 localStorage
+        // Simulate saving to localStorage
         const saved = JSON.parse(localStorage.getItem("dummyAppointments") || "[]");
         saved.push(newAppointment);
         // Set matched time slot to unavailable
@@ -129,7 +129,7 @@ import React from 'react';
         }
         localStorage.setItem("dummyAppointments", JSON.stringify(saved));
 
-        // 更新 doctor 的 slots 可用数（虚拟）
+        // Update the available number of slots for the doctor
         updateDoctorSlots(selectedDoctor.id, formattedDate, -1, doctors, setDoctors);
         
         setShowTimeModal(false);

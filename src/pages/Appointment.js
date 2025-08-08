@@ -146,40 +146,40 @@ import { Modal, Button } from 'react-bootstrap';
             const formattedDate = new Date(appointmentToRemove.date).toISOString().split("T")[0];
 
             // 4. Restore the doctor's slot count for that day
-          updateDoctorSlots(
-    appointmentToRemove.doctorId,
-    formattedDate,
-    +1,
-    doctors,
-    setDoctors
-  );
+            updateDoctorSlots(
+                appointmentToRemove.doctorId,
+                formattedDate,
+                +1,
+                doctors,
+                setDoctors
+            );
 
-  // doctor availability.time 
-  setDoctors(prevDoctors => {
-    const updatedDoctors = prevDoctors.map(doc => {
-      if (doc.id !== appointmentToRemove.doctorId) return doc;
+            // doctor availability.time 
+            setDoctors(prevDoctors => {
+                const updatedDoctors = prevDoctors.map(doc => {
+                if (doc.id !== appointmentToRemove.doctorId) return doc;
 
-      return {
-        ...doc,
-        availability: doc.availability.map(slot => {
-          const slotDate = new Date(`${slot.date}, ${new Date().getFullYear()}`).toISOString().split("T")[0];
-          if (slotDate !== formattedDate) return slot;
+                return {
+                    ...doc,
+                    availability: doc.availability.map(slot => {
+                    const slotDate = new Date(`${slot.date}, ${new Date().getFullYear()}`).toISOString().split("T")[0];
+                    if (slotDate !== formattedDate) return slot;
 
-          const updatedTimes = slot.times.map(t => {
-            if (t.time === appointmentToRemove.startTime) {
-              return { ...t, available: true };
-            }
-            return t;
-          });
+                    const updatedTimes = slot.times.map(t => {
+                        if (t.time === appointmentToRemove.startTime) {
+                        return { ...t, available: true };
+                        }
+                        return t;
+                    });
 
-          return { ...slot, times: updatedTimes };
-        })
-      };
-    });
+                    return { ...slot, times: updatedTimes };
+                    })
+                };
+                });
 
-    localStorage.setItem("doctors", JSON.stringify(updatedDoctors));
-    return updatedDoctors;
-  });
+                localStorage.setItem("doctors", JSON.stringify(updatedDoctors));
+                return updatedDoctors;
+            });
             // 5. Show confirmation alert
             alert("Appointment cancelled .");
             };

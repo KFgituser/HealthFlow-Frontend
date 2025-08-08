@@ -27,19 +27,19 @@ import axios from 'axios';
             return;
           }
           
- const data = {
-    emailOrPhone: formData.emailOrPhone,
-    verificationCode: formData.verificationCode,
-    newPassword: formData.newPassword
-  };
+        const data = {
+            emailOrPhone: formData.emailOrPhone,
+            verificationCode: formData.verificationCode,
+            newPassword: formData.newPassword
+        };
 
-  try {
-    await axios.post(`${API_BASE}/api/users/reset-password`, data, {
-      withCredentials: true, // 
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
+          try {
+          await axios.post(`${API_BASE}/api/users/reset-password`, data, {
+            withCredentials: true, //credentials
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
 
             alert('Password reset successfully!');
             navigate('/login');
@@ -50,8 +50,7 @@ import axios from 'axios';
         }
 
         return (
-            <div>
-            
+        <div>     
             {/* Top Navbar */}
             <div className="bg-white border-bottom">
               <div className="container d-flex justify-content-between align-items-center" style={{ height: "108px" }}>
@@ -80,7 +79,7 @@ import axios from 'axios';
             ]}
             />
            
-
+             {/* reset password form */}
             <div className={styles.container}>
                 <h2 className={styles.heading}>Reset my password</h2>
                 <form onSubmit={handleSubmit}>
